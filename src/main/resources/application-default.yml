@@ -1,0 +1,63 @@
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: debug
+    org.springframework.boot.actuate: off
+    org.springframework.web: debug
+    org.springframework.boot: info
+    org.springframework.orm.jpa: debug
+    org.springframework.transaction: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type: off
+    org.hibernate.tool.schema: error
+    com.zaxxer.hikari: error
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+    com.kakaomobility: debug
+    springfox: off
+
+server:
+  error:
+    include-stacktrace: always
+    whitelabel:
+      enabled: false
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  port: 4210
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+      use-new-id-generator-mappings: false
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    properties:
+      hibernate:
+        use_sql_comments: true
+        default_batch_fetch_size: 50
+        enable_lazy_load_no_trans: false
+        format_sql: true
+        dialect:
+          storage_engine: innodb
+    open-in-view: false
+
+  datasource:
+    hikari:
+      connection-test-query: SELECT 1 FROM DUAL
+      minimum-idle: 3
+      maximum-pool-size: 30
+      pool-name: SpirngBootHikariCP
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://127.0.0.1:3319/neotropical-otter?serverTimezone=Asia/Seoul
+    username: local
+    password: local
+
+  redis:
+    cluster:
+      nodes: localhost:6381
+    password: local
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27018
+      database: neotropical-otter
