@@ -10,9 +10,17 @@ import javax.persistence.EnumType
 import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
+import javax.persistence.Index
 import javax.persistence.OneToMany
+import javax.persistence.Table
 
 @Entity
+@Table(
+    indexes = [
+        Index(name = "IDX_PAYMENT_USER", columnList = "userId,createdAt"),
+        Index(name = "IDX_PAYMENT-ID", columnList = "paymentId")
+    ]
+)
 class Payment(
     val userId: Long,
     val priceOfOrder: Long

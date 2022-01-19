@@ -18,6 +18,7 @@ import javax.persistence.Id
 import javax.persistence.Index
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
 import javax.persistence.Table
 
 @Entity
@@ -58,6 +59,11 @@ class Booking(
     @ManyToOne(cascade = [ALL], fetch = LAZY)
     @JoinColumn(name = "payment_id")
     var payment: Payment? = null
+        protected set
+
+    @OneToMany(cascade = [ALL], mappedBy = "booking")
+    var items: MutableList<Item> = arrayListOf()
+        protected set
 
     fun setBy(payment: Payment) {
         this.payment = payment
@@ -82,5 +88,11 @@ class Booking(
         BOOKED("booked"),
         COMPLETED("completed"),
         CANCELED("booking canceled")
+    }
+
+    fun addBy(item: Item) {
+        items.add(item)
+        if (item.booking != this)
+            item.setBy(this)
     }
 }
