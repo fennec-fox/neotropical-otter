@@ -1,8 +1,28 @@
 package io.mustelidae.otter.neotropical.api.domain.payment.client
 
+import io.mustelidae.otter.neotropical.api.domain.payment.PaymentMethod
+import java.time.LocalDateTime
+import kotlin.random.Random
+
 class DummyBillingPayClient : BillingPayClient {
     override fun pay(userId: Long, payPayload: PayPayload): BillingClientResources.Reply.PaidResult {
-        TODO("Not yet implemented")
+
+        val methods = listOf(
+            BillingClientResources.Reply.MethodAmountPair(
+                PaymentMethod.CARD,
+                payPayload.amountOfPay - payPayload.amountOfPoint
+            ),
+            BillingClientResources.Reply.MethodAmountPair(
+                PaymentMethod.POINT,
+                payPayload.amountOfPoint
+            )
+        )
+
+        return BillingClientResources.Reply.PaidResult(
+            Random.nextLong(),
+            payPayload.amountOfPay,
+            methods, LocalDateTime.now()
+        )
     }
 
     override fun cancelEntire(
@@ -10,16 +30,11 @@ class DummyBillingPayClient : BillingPayClient {
         paymentOrderId: String,
         cause: String
     ): BillingClientResources.Reply.CancelResult {
-        TODO("Not yet implemented")
-    }
-
-    override fun cancelEntireWithPenalty(
-        paymentId: Long,
-        paymentOrderId: String,
-        cause: String,
-        penaltyAmount: Long
-    ): BillingClientResources.Reply.CancelResult {
-        TODO("Not yet implemented")
+        return BillingClientResources.Reply.CancelResult(
+            paymentId,
+            listOf(),
+            LocalDateTime.now()
+        )
     }
 
     override fun cancelPartial(
@@ -28,16 +43,10 @@ class DummyBillingPayClient : BillingPayClient {
         cause: String,
         cancelAmount: Long
     ): BillingClientResources.Reply.CancelResult {
-        TODO("Not yet implemented")
-    }
-
-    override fun cancelPartialWithPenalty(
-        paymentId: Long,
-        paymentOrderId: String,
-        cause: String,
-        cancelAmount: Long,
-        penaltyAmount: Long
-    ): BillingClientResources.Reply.CancelResult {
-        TODO("Not yet implemented")
+        return BillingClientResources.Reply.CancelResult(
+            paymentId,
+            listOf(),
+            LocalDateTime.now()
+        )
     }
 }
