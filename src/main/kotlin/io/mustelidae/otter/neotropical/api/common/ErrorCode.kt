@@ -17,6 +17,7 @@ enum class ErrorCode(val summary: String) {
 
     P000("policy error"),
     PC01("checkout error"),
+    PC02("checkout timeout"),
     PD01("develop mistake error"),
     PL01("duplicate request"),
 

@@ -1,5 +1,6 @@
 package io.mustelidae.otter.neotropical.api.domain.booking
 
+import io.mustelidae.otter.neotropical.api.common.Audit
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -19,9 +20,8 @@ class ItemOption(
     @Column(length = 200)
     val name: String,
     var description: String? = null,
-    val priceOfUnit: Long? = null,
-    val count: Int? = null
-) {
+    val price: Long? = null,
+) : Audit() {
     @Id
     @GeneratedValue
     var id: Long? = null
@@ -31,6 +31,14 @@ class ItemOption(
     @JoinColumn(name = "item_id")
     var item: Item? = null
         protected set
+
+    var status: Status = Status.ORDERED
+
+    enum class Status {
+        ORDERED,
+        CANCELED,
+        COMPLETED
+    }
 
     fun setBy(item: Item) {
         this.item = item

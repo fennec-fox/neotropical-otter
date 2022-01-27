@@ -27,7 +27,6 @@ class Item(
     var description: String? = null,
     val price: Long? = null,
     val discount: Long? = null,
-    val count: Int? = null,
     @Column(length = 32)
     val verticalId: String? = null
 ) {
@@ -65,6 +64,18 @@ class Item(
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "item", fetch = FetchType.EAGER)
     var itemOptions: MutableList<ItemOption> = arrayListOf()
         protected set
+
+    fun complete() {
+        this.status = Status.COMPLETED
+        this.itemOptions.filter { it.status == ItemOption.Status.ORDERED }
+            .forEach { it.status = ItemOption.Status.COMPLETED }
+    }
+
+    fun cancel() {
+        this.status = Status.CANCELED
+        this.itemOptions.filter { it.status == ItemOption.Status.ORDERED }
+            .forEach { it.status = ItemOption.Status.CANCELED }
+    }
 
     fun setBy(booking: Booking) {
         this.booking = booking

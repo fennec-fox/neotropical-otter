@@ -80,6 +80,12 @@ open class AsyncException(message: String, causeBy: Map<String, Any?>? = null) :
  * Policy Exception
  */
 open class PolicyException(error: ErrorSource) : CustomException(error)
+class CheckoutTimeoutException(message: String) : PolicyException(
+    Error(
+        ErrorCode.PC02,
+        message
+    )
+)
 
 /**
  * UnAuthorized Exception

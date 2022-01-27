@@ -56,6 +56,9 @@ class Booking(
 
     var isHide = false
 
+    var status: Status = Status.WAIT
+        protected set
+
     @ManyToOne(cascade = [ALL], fetch = LAZY)
     @JoinColumn(name = "payment_id")
     var payment: Payment? = null
@@ -82,6 +85,22 @@ class Booking(
     }
 
     fun getLocation(): Location? = textOfLocation?.fromJson()
+
+    fun booked() {
+        this.status = Status.BOOKED
+    }
+
+    fun cancel() {
+        this.items
+            .filter { it.status == Item.Status.ORDERED }
+            .forEach { it.cancel() }
+    }
+
+    fun completed() {
+        this.items
+            .filter { it.status == Item.Status.ORDERED }
+            .forEach { it.complete() }
+    }
 
     enum class Status(val text: String) {
         WAIT("Wait booking"),

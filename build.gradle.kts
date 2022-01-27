@@ -41,6 +41,8 @@ dependencies {
     }
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
+    implementation("androidx.security:security-crypto:1.0.0")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
