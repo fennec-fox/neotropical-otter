@@ -11,12 +11,12 @@ import java.time.Duration
 
 @Configuration
 class BillingClientConfiguration(
-    private val appEnv: AppEnvironment
+    private val appEnvironment: AppEnvironment
 ) {
 
     @Bean
     fun billingPayClient(): BillingPayClient {
-        val billingEnv = appEnv.client.billing
+        val billingEnv = appEnvironment.client.billing
 
         return if (billingEnv.useDummy)
             DummyBillingPayClient()

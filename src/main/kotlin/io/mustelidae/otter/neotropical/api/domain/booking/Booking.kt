@@ -34,6 +34,7 @@ class Booking(
     val userId: Long,
     val productCode: ProductCode,
     val topicId: String,
+    val orderId: String,
     val title: String,
     val description: String? = null,
     val reservationDate: LocalDateTime ? = null

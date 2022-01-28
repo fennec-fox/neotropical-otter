@@ -3,6 +3,7 @@ package io.mustelidae.otter.neotropical.api.domain.order
 import io.mustelidae.otter.neotropical.api.common.Privacy
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
+import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
 import io.mustelidae.otter.neotropical.api.config.CheckoutTimeoutException
 import io.mustelidae.otter.neotropical.utils.Crypto
 import org.bson.types.ObjectId
@@ -17,7 +18,8 @@ class OrderSheet(
     val productCode: ProductCode,
     val topicId: String,
     val products: List<Product>,
-    var preDefineField: Map<String, Any?>,
+    val adjustmentId: Long,
+    var preDefineField: Map<String, Any?>?,
 ) : Sheet {
     override val schemaVersion: Long = 1
 
@@ -42,6 +44,9 @@ class OrderSheet(
         FAIL
     }
 
+    var policyCapture: PolicyCapture? = null
+        private set
+
     var textOfPrivacy: String? = null
         private set
 
@@ -59,12 +64,14 @@ class OrderSheet(
 
     class Product(
         val title: String,
+        val contents: List<SimpleContent>,
+        val goods: List<Goods>?,
+        val id: Long? = null,
         val price: Long? = null,
         val description: String? = null,
         val reservationDate: LocalDateTime? = null,
-        val contents: List<SimpleContent>,
-        val id: Long? = null,
-        val preDefineField: Map<String, Any?>? = null,
+
+        val preDefineField: Map<String, Any?>? = null
     ) {
 
         data class Goods(
@@ -86,10 +93,42 @@ class OrderSheet(
         }
     }
 
+    class PolicyCapture(
+        val captureDate: LocalDateTime,
+        val snapShotPolicyCards: List<PolicyCard>
+    )
+
     fun availableOrThrow() {
         if (status != Status.WAIT)
             throw IllegalStateException("Unavailable order")
         if (ChronoUnit.MINUTES.between(createdAt, LocalDateTime.now()) > 360)
             throw CheckoutTimeoutException("Expired Checkout")
+    }
+
+    fun ordered() {
+        if (Status.ORDERED == status)
+            throw IllegalStateException("Your order has already been placed.")
+        if (Status.FAIL == status)
+            throw IllegalStateException("Your order has already failed.")
+
+        status = Status.ORDERED
+        modifiedAt = LocalDateTime.now()
+    }
+
+    fun writeSnapShot(policyCapture: PolicyCapture) {
+        this.policyCapture = policyCapture
+        this.modifiedAt = LocalDateTime.now()
+    }
+
+    fun hasPolicySnapShot(): Boolean {
+        return (policyCapture != null)
+    }
+
+    fun failed() {
+        if (Status.ORDERED == status)
+            throw IllegalStateException("이미 승인 완료된 주문 건입니다.")
+
+        this.status = Status.FAIL
+        this.modifiedAt = LocalDateTime.now()
     }
 }

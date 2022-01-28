@@ -13,31 +13,44 @@ import org.springframework.context.annotation.Configuration
 class SwaggerConfiguration {
 
     @Bean
-    fun default(): GroupedOpenApi = GroupedOpenApi.builder()
+    fun apiV1(): GroupedOpenApi = GroupedOpenApi.builder()
         .group("API")
+        .addOpenApiCustomiser {
+            it.info.version("v1")
+        }
         .packagesToScan("io.mustelidae.otter.neotropical.api.domain")
-        .pathsToMatch("(?!/maintenance).+")
+        .pathsToMatch("/v1/**")
+        .pathsToExclude("/v1/maintenance/**", "/v1/migration/**", "/v1/bridge/**")
         .build()
 
     @Bean
     fun maintenance(): GroupedOpenApi = GroupedOpenApi.builder()
         .group("Maintenance")
+        .addOpenApiCustomiser {
+            it.info.version("v1")
+        }
         .packagesToScan("io.mustelidae.otter.neotropical.api.domain")
-        .pathsToMatch("/maintenance/**")
+        .pathsToMatch("/v1/maintenance/**")
         .build()
 
     @Bean
     fun migration(): GroupedOpenApi = GroupedOpenApi.builder()
         .group("Migration")
+        .addOpenApiCustomiser {
+            it.info.version("v1")
+        }
         .packagesToScan("io.mustelidae.otter.neotropical.api.domain")
-        .pathsToMatch("/migration/**")
+        .pathsToMatch("/v1/migration/**")
         .build()
 
     @Bean
     fun bridge(): GroupedOpenApi = GroupedOpenApi.builder()
         .group("Bridge")
+        .addOpenApiCustomiser {
+            it.info.version("v1")
+        }
         .packagesToScan("io.mustelidae.otter.neotropical.api.domain")
-        .pathsToMatch("/bridge/**")
+        .pathsToMatch("/v1/bridge/**")
         .build()
 
     @Bean

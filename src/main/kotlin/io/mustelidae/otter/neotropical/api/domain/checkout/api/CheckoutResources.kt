@@ -1,27 +1,31 @@
-package io.mustelidae.otter.neotropical.api.domain.checkout
+package io.mustelidae.otter.neotropical.api.domain.checkout.api
 
 import io.mustelidae.otter.neotropical.api.common.Privacy
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
-import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class CheckoutResources {
 
     class Request {
 
+        @Schema(name = "Checkout.Request.Checkout", title = "뭘까?")
         class Checkout(
-            val products: List<OrderSheet.Product>,
+            val userId: Long,
+            val products: List<ProductOrder>,
+            val adjustmentId: Long,
             var preDefineField: Map<String, Any?>? = null,
             val privacy: Privacy? = null
         ) {
             data class ProductOrder(
                 val title: String,
+                val contents: List<SimpleContent>,
+                val goodsOrders: List<GoodsOrder>? = null,
                 val price: Long? = null,
                 val description: String? = null,
                 val reservationDate: LocalDateTime? = null,
-                val contents: List<SimpleContent>,
                 val id: Long? = null,
-                val preDefineField: Map<String, Any?>? = null,
+                val preDefineField: Map<String, Any?>? = null
             ) {
 
                 data class GoodsOrder(
@@ -31,17 +35,19 @@ class CheckoutResources {
                     val priceOfUnit: Long? = null,
                     val discountPriceOfUnit: Long? = null,
                     val description: String? = null,
-                    val goodsOptions: List<GoodsOptionOrder>?
+                    val goodsOptionOrders: List<GoodsOptionOrder>? = null
                 ) {
 
                     data class GoodsOptionOrder(
                         val name: String,
                         var description: String? = null,
                         val price: Long? = null,
-                        val id: Long? = null,
+                        val id: Long? = null
                     )
                 }
             }
+
+            companion object
         }
     }
 }
