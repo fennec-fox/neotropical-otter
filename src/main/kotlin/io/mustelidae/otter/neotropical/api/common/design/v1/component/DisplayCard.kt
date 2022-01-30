@@ -33,7 +33,7 @@ data class DisplayCard(
 
             data class Link(
                 val name: String,
-                val url: String
+                val url: String,
             )
         }
     }

@@ -21,7 +21,7 @@ class OrderSheet(
     val adjustmentId: Long,
     var preDefineField: Map<String, Any?>?,
 ) : Sheet {
-    override val schemaVersion: Long = 1
+    override var schemaVersion: Long = 1
 
     @Id
     var id: ObjectId = ObjectId()
@@ -70,7 +70,6 @@ class OrderSheet(
         val price: Long? = null,
         val description: String? = null,
         val reservationDate: LocalDateTime? = null,
-
         val preDefineField: Map<String, Any?>? = null
     ) {
 

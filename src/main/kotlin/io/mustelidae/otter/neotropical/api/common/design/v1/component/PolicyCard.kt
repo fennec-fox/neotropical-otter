@@ -4,7 +4,8 @@ class PolicyCard(
     val order: Int,
     val title: String,
     val explanations: List<Explanation>,
-    val isFold: Boolean = false
+    val isFold: Boolean = false,
+    val showOnlyAdmin: Boolean
 ) {
     data class Explanation(
         val order: Int,
