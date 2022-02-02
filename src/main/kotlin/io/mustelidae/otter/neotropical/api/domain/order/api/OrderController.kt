@@ -4,6 +4,7 @@ import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.Reply
 import io.mustelidae.otter.neotropical.api.common.toReply
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
+import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.bson.types.ObjectId
@@ -27,6 +28,9 @@ class OrderController(
         @PathVariable orderId: String
     ): Reply<OrderResources.Reply.PurchaseOrder> {
         val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(orderId))
+
+        DataAuthentication(RoleHeader.XUser).validateOrThrow(orderSheet)
+
         return OrderResources.Reply.PurchaseOrder.from(orderSheet)
             .toReply()
     }

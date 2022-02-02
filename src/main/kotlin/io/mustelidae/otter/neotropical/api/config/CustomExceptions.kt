@@ -92,4 +92,7 @@ class CheckoutTimeoutException(message: String) : PolicyException(
  */
 open class UnAuthorizedException(error: ErrorSource) : CustomException(error)
 
-class PermissionException(message: String) : UnAuthorizedException(Error(ErrorCode.HA01, message))
+class PermissionException : UnAuthorizedException {
+    constructor() : super(Error(ErrorCode.HA00, "Access denied"))
+    constructor(message: String) : super(Error(ErrorCode.HA01, message))
+}

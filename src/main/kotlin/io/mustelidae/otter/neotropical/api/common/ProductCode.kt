@@ -1,5 +1,5 @@
 package io.mustelidae.otter.neotropical.api.common
 
-enum class ProductCode(val title: String) {
-    MOCK_UP("mock up")
+enum class ProductCode(val id: String) {
+    MOCK_UP("UXvjQPI5cp5R7CzF")
 }
