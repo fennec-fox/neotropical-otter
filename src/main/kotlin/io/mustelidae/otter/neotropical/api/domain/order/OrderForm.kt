@@ -38,6 +38,7 @@ class OrderForm(
                 },
                 adjustmentId,
                 preDefineField,
+                settlementDate
             )
 
             privacy?.let { orderSheet.setPrivacy(it) }
@@ -65,12 +66,26 @@ class OrderForm(
     }
 
     fun inspect(): Boolean {
-        inspectPrice(orderSheet, errors)
+        inspectPrice()
+        inspectSettlementDate()
 
         return errors.hasErrors().not()
     }
 
-    private fun inspectPrice(orderSheet: OrderSheet, errors: Errors) {
+    private fun inspectSettlementDate() {
+        if (orderSheet.settlementDate == null) {
+            val existDate = orderSheet.products.filter { it.reservationDate != null }
+            if (existDate.isNullOrEmpty())
+                errors.rejectValue(
+                    "parameter",
+                    ErrorCode.HI01.toString(),
+                    arrayOf("accountSettlementDate", "reservationDate"),
+                    "One of the reservation date and expected settlement date information must be entered."
+                )
+        }
+    }
+
+    private fun inspectPrice() {
         var sumOrNull: Long? = null
 
         for (product in orderSheet.products) {

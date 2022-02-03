@@ -3,6 +3,7 @@ package io.mustelidae.otter.neotropical.api.domain.checkout.api
 import io.mustelidae.otter.neotropical.api.common.Privacy
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class CheckoutResources {
@@ -14,8 +15,9 @@ class CheckoutResources {
             val userId: Long,
             val products: List<ProductOrder>,
             val adjustmentId: Long,
-            var preDefineField: Map<String, Any?>? = null,
-            val privacy: Privacy? = null
+            var preDefineField: Map<String, Any>? = null,
+            val privacy: Privacy? = null,
+            val settlementDate: LocalDate? = null
         ) {
             data class ProductOrder(
                 val title: String,

@@ -4,11 +4,13 @@ import io.mustelidae.otter.neotropical.api.common.Privacy
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
+import io.mustelidae.otter.neotropical.api.common.method.pay.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.config.CheckoutTimeoutException
 import io.mustelidae.otter.neotropical.utils.Crypto
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -19,7 +21,8 @@ class OrderSheet(
     val topicId: String,
     val products: List<Product>,
     val adjustmentId: Long,
-    var preDefineField: Map<String, Any?>?,
+    var preDefineField: Map<String, Any>?,
+    val settlementDate: LocalDate? = null
 ) : Sheet {
     override var schemaVersion: Long = 1
 
@@ -49,6 +52,8 @@ class OrderSheet(
 
     var textOfPrivacy: String? = null
         private set
+
+    var estimateUsingPayMethod: UsingPayMethod? = null
 
     fun setPrivacy(
         privacy: Privacy
@@ -96,6 +101,14 @@ class OrderSheet(
         val captureDate: LocalDateTime,
         val snapShotPolicyCards: List<PolicyCard>
     )
+
+    fun setUsingPayMethod(usingPayMethod: UsingPayMethod) {
+        availableOrThrow()
+        if (this.estimateUsingPayMethod != null)
+            throw IllegalStateException("Payment method information has already been set.")
+
+        this.estimateUsingPayMethod = usingPayMethod
+    }
 
     fun availableOrThrow() {
         if (status != Status.WAIT)

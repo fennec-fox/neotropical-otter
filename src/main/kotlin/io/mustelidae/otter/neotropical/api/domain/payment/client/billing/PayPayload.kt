@@ -1,6 +1,7 @@
-package io.mustelidae.otter.neotropical.api.domain.payment.client
+package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
+import io.mustelidae.otter.neotropical.api.common.method.pay.UsingPayMethod
 import java.time.LocalDate
 
 interface PayPayload {
@@ -10,12 +11,9 @@ interface PayPayload {
     val type: PayType
     val adjustmentId: Long
     val paymentOrderId: String
-    val itemId: Long
     val itemName: String
     val accountSettlementDate: LocalDate
     val amountOfPay: Long
-    val amountOfPoint: Long
-    val discountCouponId: Long?
-    val payKey: String?
-    val preDefineValue: MutableMap<String, Any>?
+    val usingPayMethod: UsingPayMethod
+    val preDefineValue: Map<String, Any>?
 }

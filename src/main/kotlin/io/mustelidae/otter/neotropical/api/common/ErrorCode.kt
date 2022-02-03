@@ -19,7 +19,9 @@ enum class ErrorCode(val summary: String) {
     PC01("checkout error"),
     PC02("checkout timeout"),
     PD01("develop mistake error"),
+    PD02("Found that a required value is missing"),
     PL01("duplicate request"),
+    PP01("exceed the limit"),
 
     S000("common system error"),
     SA00("async execute error"),

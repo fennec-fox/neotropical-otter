@@ -115,4 +115,6 @@ class Booking(
         if (item.booking != this)
             item.setBy(this)
     }
+
+    companion object
 }

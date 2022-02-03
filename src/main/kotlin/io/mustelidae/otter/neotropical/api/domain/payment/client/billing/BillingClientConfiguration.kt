@@ -1,4 +1,4 @@
-package io.mustelidae.otter.neotropical.api.domain.payment.client
+package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
 
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.netty.channel.ChannelOption

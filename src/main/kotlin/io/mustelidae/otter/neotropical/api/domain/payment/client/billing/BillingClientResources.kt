@@ -1,7 +1,7 @@
-package io.mustelidae.otter.neotropical.api.domain.payment.client
+package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
 
 import io.mustelidae.otter.neotropical.api.common.ErrorSource
-import io.mustelidae.otter.neotropical.api.domain.payment.PaymentMethod
+import io.mustelidae.otter.neotropical.api.common.method.pay.PaymentMethod
 import java.time.LocalDateTime
 
 class BillingClientResources {

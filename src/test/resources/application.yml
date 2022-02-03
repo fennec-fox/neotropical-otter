@@ -71,3 +71,17 @@ app:
   client:
     billing:
       use-dummy: true
+  products:
+    -
+      host: localhost
+      timeout: 4000
+      logging: true
+      use-dummy: true
+      product-code: MOCK_UP
+      topics:
+        -
+          id: MOCK-6rUge4jHAWAzI8tQAoo
+          landing-way: WEB_VIEW
+          landing:
+            active-detail: /using/booking/{bookingId}
+            record-detail: /end/booking/{bookingId}

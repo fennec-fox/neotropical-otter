@@ -1,8 +1,11 @@
 package io.mustelidae.otter.neotropical.api.domain.payment
 
 import io.mustelidae.otter.neotropical.api.common.Audit
+import io.mustelidae.otter.neotropical.api.common.method.pay.PaymentMethod
+import io.mustelidae.otter.neotropical.api.common.method.pay.Voucher
 import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
+import org.bson.types.ObjectId
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -42,6 +45,9 @@ class Payment(
     @Column(length = 20, nullable = false)
     var status: Status = Status.PENDING
         protected set
+
+    // voucher
+    var voucherId: Long? = null
 
     // pay
     var paymentId: Long? = null
@@ -90,11 +96,17 @@ class Payment(
             booking.setBy(this)
     }
 
+    fun usingVoucher(voucher: Voucher) {
+        this.voucherId = voucher.id
+        this.textOfMethods = voucher.paymentMethod.name
+        this.paidDate = LocalDateTime.now()
+    }
+
     fun pay(
         amountOfPay: Long,
-        adjustmentId: Long,
-        paymentOrderId: String,
-        payKey: String?
+        paymentOrderId: ObjectId,
+        payKey: String?,
+        adjustmentId: Long? = null
     ) {
         if (status != Status.PENDING)
             throw DevelopMistakeException("Payment is not pending.")
@@ -102,8 +114,23 @@ class Payment(
         this.status = Status.PAY
         this.paidDate = LocalDateTime.now()
         this.adjustmentId = adjustmentId
+        this.paymentOrderId = paymentOrderId.toString()
         this.payKey = payKey
-        this.paymentOrderId = paymentOrderId
+
+        if (payKey.isNullOrBlank().not())
+            this.textOfMethods = PaymentMethod.CARD.name
+    }
+
+    fun repay(
+        amountOfRepay: Long,
+        adjustmentId: Long? = null
+    ) {
+        if (status != Status.PAY)
+            throw DevelopMistakeException("Repayment is possible only after payment has been completed.")
+
+        this.paidAmount = paidAmount
+        this.paidDate = LocalDateTime.now()
+        this.adjustmentId = adjustmentId
     }
 
     fun paid(
@@ -139,7 +166,7 @@ class Payment(
         this.penaltyAmount = amountOfPenalty
     }
 
-    fun cancelEntireBeforePaid() {
+    fun cancelByChangeOnlyStatus() {
         status = Status.CANCEL_ALL
         cancelledDate = LocalDateTime.now()
     }

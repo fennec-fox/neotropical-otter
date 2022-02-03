@@ -1,5 +1,6 @@
 package io.mustelidae.otter.neotropical.api.permission
 
+import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 
 class UserPermission(
@@ -9,6 +10,12 @@ class UserPermission(
 
     override fun checkOrderSheet(orderSheet: OrderSheet): Boolean {
         val isOk = (id == orderSheet.userId)
+        valid = isOk && valid
+        return isOk
+    }
+
+    override fun checkBooking(booking: Booking): Boolean {
+        val isOk = (id == booking.userId)
         valid = isOk && valid
         return isOk
     }

@@ -30,7 +30,10 @@ class MissingRequestXHeaderException(headerName: String) : HumanException(Error(
 class InvalidArgumentException(message: String) : HumanException(Error(ErrorCode.HI01, message))
 
 open class SystemException(error: ErrorSource) : CustomException(error)
-class DevelopMistakeException(message: String, causeBy: Map<String, Any?>? = null) : SystemException(Error(ErrorCode.PD01, message, causeBy))
+class DevelopMistakeException : SystemException {
+    constructor(errorCode: ErrorCode) : super(Error(errorCode, errorCode.summary))
+    constructor(message: String, causeBy: Map<String, Any?>? = null) : super(Error(ErrorCode.PD01, message, causeBy))
+}
 
 open class CommunicationException(error: ErrorSource) : CustomException(error)
 class ClientException(target: String, message: String, code: String? = null) : CommunicationException(

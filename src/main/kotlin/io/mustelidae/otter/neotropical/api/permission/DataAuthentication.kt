@@ -3,6 +3,7 @@ package io.mustelidae.otter.neotropical.api.permission
 import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
 import io.mustelidae.otter.neotropical.api.config.MissingRequestXHeaderException
 import io.mustelidae.otter.neotropical.api.config.PermissionException
+import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
@@ -12,10 +13,26 @@ class DataAuthentication(
 ) {
     private var permissions: MutableList<Permission> = mutableListOf()
 
-    fun validateOrThrow(orderSheet: OrderSheet) {
+    fun validOrThrow(orderSheet: OrderSheet) {
         for (permission in permissions) {
             if (permission.checkOrderSheet(orderSheet).not())
                 throw PermissionException()
+        }
+    }
+
+    fun validOrThrow(booking: Booking) {
+        for (permission in permissions) {
+            if (permission.checkBooking(booking).not())
+                throw PermissionException()
+        }
+    }
+
+    fun validOrThrow(bookings: List<Booking>) {
+        for (permission in permissions) {
+            for (booking in bookings) {
+                permission.checkBooking(booking).not()
+                throw PermissionException()
+            }
         }
     }
 

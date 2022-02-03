@@ -29,7 +29,7 @@ class OrderController(
     ): Reply<OrderResources.Reply.PurchaseOrder> {
         val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(orderId))
 
-        DataAuthentication(RoleHeader.XUser).validateOrThrow(orderSheet)
+        DataAuthentication(RoleHeader.XUser).validOrThrow(orderSheet)
 
         return OrderResources.Reply.PurchaseOrder.from(orderSheet)
             .toReply()
