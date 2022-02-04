@@ -42,7 +42,7 @@ class VoucherPayWay : PayWay {
     }
 
     constructor(voucherClient: VoucherClient, userId: Long, priceOfOrder: Long) {
-        this.payment = Payment(userId, priceOfOrder)
+        this.payment = Payment(userId, priceOfOrder, PayWay.Type.VOUCHER)
         this.voucherClient = voucherClient
     }
 }

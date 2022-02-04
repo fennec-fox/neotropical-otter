@@ -39,6 +39,6 @@ class FreePayWay : PayWay {
     }
 
     constructor(userId: Long, priceOfOrder: Long) {
-        this.payment = Payment(userId, priceOfOrder)
+        this.payment = Payment(userId, priceOfOrder, PayWay.Type.FREE)
     }
 }

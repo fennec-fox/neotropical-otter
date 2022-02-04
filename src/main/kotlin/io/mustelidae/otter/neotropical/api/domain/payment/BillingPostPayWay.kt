@@ -8,7 +8,7 @@ import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.Default
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.PayType
 import java.time.LocalDate
 
-class PostBillingPayWay : PayWay {
+class BillingPostPayWay : PayWay {
     override val payment: Payment
     private val billingPayClient: BillingPayClient
 
@@ -43,12 +43,12 @@ class PostBillingPayWay : PayWay {
     }
 
     override fun repay(amountOfRepay: Long, adjustmentId: Long?) {
-        BillingPayWay(billingPayClient, payment).repay(amountOfRepay, adjustmentId)
+        BillingPrePayWay(billingPayClient, payment).repay(amountOfRepay, adjustmentId)
     }
 
     override fun cancel(cause: String) {
         if (this.payment.isPaid())
-            BillingPayWay(billingPayClient, payment).cancel(cause)
+            BillingPrePayWay(billingPayClient, payment).cancel(cause)
         else {
             this.payment.cancelByChangeOnlyStatus()
         }
@@ -56,7 +56,7 @@ class PostBillingPayWay : PayWay {
 
     override fun cancelWithPenalty(cause: String, amountOfPenalty: Long) {
         if (this.payment.isPaid())
-            BillingPayWay(billingPayClient, payment).cancelWithPenalty(cause, amountOfPenalty)
+            BillingPrePayWay(billingPayClient, payment).cancelWithPenalty(cause, amountOfPenalty)
         else {
             this.payment.cancelByChangeOnlyStatus()
         }
@@ -80,7 +80,7 @@ class PostBillingPayWay : PayWay {
         userId: Long,
         priceOfOrder: Long
     ) {
-        this.payment = Payment(userId, priceOfOrder)
+        this.payment = Payment(userId, priceOfOrder, PayWay.Type.POST_PAY)
         this.billingPayClient = billingPayClient
     }
 }

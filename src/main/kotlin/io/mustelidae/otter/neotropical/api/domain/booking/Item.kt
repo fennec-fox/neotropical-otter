@@ -28,7 +28,7 @@ class Item(
     val price: Long? = null,
     val discount: Long? = null,
     @Column(length = 32)
-    val verticalId: String? = null
+    val verticalId: Long? = null
 ) {
     @Id
     @GeneratedValue

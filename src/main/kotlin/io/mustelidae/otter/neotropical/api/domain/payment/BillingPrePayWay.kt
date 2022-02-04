@@ -8,7 +8,7 @@ import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.Default
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.PayType
 import java.time.LocalDate
 
-class BillingPayWay : PayWay {
+class BillingPrePayWay : PayWay {
 
     override val payment: Payment
     private val billingPayClient: BillingPayClient
@@ -99,7 +99,7 @@ class BillingPayWay : PayWay {
         userId: Long,
         priceOfOrder: Long,
     ) {
-        this.payment = Payment(userId, priceOfOrder)
+        this.payment = Payment(userId, priceOfOrder, PayWay.Type.PRE_PAY)
         this.billingPayClient = billingPayClient
     }
 

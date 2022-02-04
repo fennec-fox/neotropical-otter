@@ -85,7 +85,7 @@ class OrderSheet(
             val priceOfUnit: Long? = null,
             val discountPriceOfUnit: Long? = null,
             val description: String? = null,
-            val goodsOptions: List<GoodsOption>?
+            val goodsOptions: List<GoodsOption>? = null
         ) {
 
             data class GoodsOption(

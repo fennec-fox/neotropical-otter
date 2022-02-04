@@ -95,12 +95,14 @@ class Booking(
         this.items
             .filter { it.status == Item.Status.ORDERED }
             .forEach { it.cancel() }
+        this.status = Status.CANCELED
     }
 
     fun completed() {
         this.items
             .filter { it.status == Item.Status.ORDERED }
             .forEach { it.complete() }
+        this.status = Status.COMPLETED
     }
 
     enum class Status(val text: String) {

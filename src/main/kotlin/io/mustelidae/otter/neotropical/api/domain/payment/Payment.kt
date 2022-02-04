@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
+import javax.persistence.EnumType.*
 import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -26,7 +27,9 @@ import javax.persistence.Table
 )
 class Payment(
     val userId: Long,
-    val priceOfOrder: Long
+    val priceOfOrder: Long,
+    @Enumerated(STRING)
+    val payType: PayWay.Type
 ) : Audit() {
 
     @Id
@@ -41,7 +44,7 @@ class Payment(
 
     private var textOfMethods: String? = null
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     @Column(length = 20, nullable = false)
     var status: Status = Status.PENDING
         protected set

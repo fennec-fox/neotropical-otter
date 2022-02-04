@@ -13,7 +13,7 @@ class DividingQuantityBookingMaker(
         }
     }
 
-    fun make(
+    private fun make(
         userId: Long,
         productCode: ProductCode,
         topicId: String,
@@ -29,11 +29,21 @@ class DividingQuantityBookingMaker(
             product.description,
             product.reservationDate
         )
-        TODO()
+        product.goods?.flatMap { make(it) }?.forEach { booking.addBy(it) }
+        return booking
     }
 
-    fun make(goods: OrderSheet.Product.Goods): List<Item> {
-        TODO()
+    private fun make(goods: OrderSheet.Product.Goods): List<Item> {
+        val items = mutableListOf<Item>()
+        for(i in 1..goods.quantity) {
+            goods.run {
+                val item = Item(name, description, priceOfUnit, discountPriceOfUnit, id)
+                goods.goodsOptions?.map { make(it) }?.forEach { item.addBy(it) }
+                items.add(item)
+            }
+        }
+
+        return items
     }
 
     private fun make(goodsOption: OrderSheet.Product.Goods.GoodsOption): ItemOption {

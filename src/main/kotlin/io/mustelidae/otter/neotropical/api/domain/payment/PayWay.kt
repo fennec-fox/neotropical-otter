@@ -27,4 +27,11 @@ interface PayWay {
     fun cancelWithPenalty(cause: String, amountOfPenalty: Long)
     fun cancelPartial(cause: String, partialCancelAmount: Long)
     fun cancelPartialWithPenalty(cause: String, partialCancelAmount: Long, amountOfPenalty: Long)
+
+    enum class Type {
+        POST_PAY,
+        PRE_PAY,
+        FREE,
+        VOUCHER,
+    }
 }
