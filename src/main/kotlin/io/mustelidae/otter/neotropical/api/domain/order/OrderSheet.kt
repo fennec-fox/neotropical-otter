@@ -94,16 +94,36 @@ class OrderSheet(
                 val price: Long? = null,
                 val id: Long? = null,
             )
+
+            fun getTotalPrice(): Long {
+                val priceOfGoods = ((priceOfUnit ?: 0) - (discountPriceOfUnit ?: 0)) * quantity
+                val priceOfOption = goodsOptions?.sumOf { it.price ?: 0 } ?: 0
+                return priceOfGoods + priceOfOption
+            }
+        }
+
+        fun getTotalPrice(): Long {
+            val priceOfGoods = goods?.sumOf { it.getTotalPrice() } ?: 0
+            return priceOfGoods + (price ?: 0)
         }
     }
 
-    class PolicyCapture(
+    fun getPriceOfOrder(): Long {
+        return products.sumOf { it.getTotalPrice() }
+    }
+
+    data class PolicyCapture(
         val captureDate: LocalDateTime,
         val snapShotPolicyCards: List<PolicyCard>
     )
 
+    fun capture(captureDate: LocalDateTime, snapShotPolicyCards: List<PolicyCard>) {
+        if (Status.ORDERED != status)
+            throw IllegalStateException("This is only possible when the order has been placed.")
+        this.policyCapture = PolicyCapture(captureDate, snapShotPolicyCards)
+    }
+
     fun setUsingPayMethod(usingPayMethod: UsingPayMethod) {
-        availableOrThrow()
         if (this.estimateUsingPayMethod != null)
             throw IllegalStateException("Payment method information has already been set.")
 
@@ -115,6 +135,7 @@ class OrderSheet(
             throw IllegalStateException("Unavailable order")
         if (ChronoUnit.MINUTES.between(createdAt, LocalDateTime.now()) > 360)
             throw CheckoutTimeoutException("Expired Checkout")
+        this.estimateUsingPayMethod?.validOrThrow()
     }
 
     fun ordered() {
@@ -138,7 +159,7 @@ class OrderSheet(
 
     fun failed() {
         if (Status.ORDERED == status)
-            throw IllegalStateException("이미 승인 완료된 주문 건입니다.")
+            throw IllegalStateException("The order has already been approved.")
 
         this.status = Status.FAIL
         this.modifiedAt = LocalDateTime.now()

@@ -27,7 +27,8 @@ class DividingQuantityBookingMaker(
             orderId,
             product.title,
             product.description,
-            product.reservationDate
+            product.reservationDate,
+            product.price
         )
         product.goods?.flatMap { make(it) }?.forEach { booking.addBy(it) }
         return booking
@@ -35,7 +36,7 @@ class DividingQuantityBookingMaker(
 
     private fun make(goods: OrderSheet.Product.Goods): List<Item> {
         val items = mutableListOf<Item>()
-        for(i in 1..goods.quantity) {
+        for (i in 1..goods.quantity) {
             goods.run {
                 val item = Item(name, description, priceOfUnit, discountPriceOfUnit, id)
                 goods.goodsOptions?.map { make(it) }?.forEach { item.addBy(it) }

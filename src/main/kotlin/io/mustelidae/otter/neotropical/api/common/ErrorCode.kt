@@ -22,11 +22,14 @@ enum class ErrorCode(val summary: String) {
     PD02("Found that a required value is missing"),
     PL01("duplicate request"),
     PP01("exceed the limit"),
+    PP02("There are no items that can be canceled."),
+    PP03("Vertical's Policy"),
 
     S000("common system error"),
     SA00("async execute error"),
     SI01("illegal state error"),
-    SD01("database access error"),
+    SI02("database access error"),
+    SD01("This error is a compilation error level. Check out the code"),
 
     C000("communication error"),
     CT01("connection timeout"),

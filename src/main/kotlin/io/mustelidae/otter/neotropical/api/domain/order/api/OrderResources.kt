@@ -9,6 +9,12 @@ import java.time.LocalDateTime
 
 class OrderResources {
 
+    class Modify {
+        data class Order(
+            val status: OrderSheet.Status,
+        )
+    }
+
     class Reply {
         data class PurchaseOrder(
             val id: String,

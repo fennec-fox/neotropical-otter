@@ -88,4 +88,10 @@ class Item(
         if (itemOption.item != this)
             itemOption.setBy(this)
     }
+
+    fun getTotalPrice(): Long {
+        val price = ((price ?: 0) - (discount ?: 0))
+        val priceOfOption = itemOptions.sumOf { it.price ?: 0 }
+        return price + priceOfOption
+    }
 }

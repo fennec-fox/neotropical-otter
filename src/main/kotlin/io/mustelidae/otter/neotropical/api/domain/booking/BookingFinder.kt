@@ -16,6 +16,14 @@ class BookingFinder
     private val bookingRepository: BookingRepository
 ) {
 
+    fun findIn(bookingIds: List<Long>): List<Booking> {
+        val bookings = bookingRepository.findAllById(bookingIds)
+        if (bookings.size != bookingIds.size)
+            throw DataNotFindException("Couldn't find all the booking for the requested ID.")
+
+        return bookings
+    }
+
     fun findAllActive(userId: Long): List<Booking> {
         return bookingDSLRepository.findAllWithStatus(userId, Booking.Status.WAIT, Booking.Status.BOOKED) ?: emptyList()
     }

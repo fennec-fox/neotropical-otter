@@ -46,7 +46,7 @@ class ExceptionConfiguration(
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ResponseBody
     fun handleInvalidDataAccessApiUsageException(e: InvalidDataAccessApiUsageException, request: HttpServletRequest): Map<String, Any> {
-        return errorForm(request, e, Error(ErrorCode.SD01, e.message!!))
+        return errorForm(request, e, Error(ErrorCode.SI02, e.message!!))
     }
 
     /**

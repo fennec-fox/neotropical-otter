@@ -18,6 +18,7 @@ class AppEnvironment {
 
     class Product : ConnInfo() {
         lateinit var productCode: ProductCode
+        var dummyControl = DummyControl()
         var topics: List<Topic> = emptyList()
 
         class Topic {
@@ -29,6 +30,13 @@ class AppEnvironment {
                 var activeDetail: String? = null
                 var recordDetail: String? = null
             }
+        }
+
+        class DummyControl {
+            var cancel: Boolean = true
+            var obtainApproval: Boolean = true
+            var cancelByItem: Boolean = true
+            var callOff: Boolean = true
         }
     }
 

@@ -1,6 +1,9 @@
-package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
+package io.mustelidae.otter.neotropical.api.config.injection
 
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.DummyBillingPayClient
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.StableBillingPayClient
 import io.netty.channel.ChannelOption
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

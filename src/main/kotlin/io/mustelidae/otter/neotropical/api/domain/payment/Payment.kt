@@ -9,8 +9,7 @@ import org.bson.types.ObjectId
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.EnumType.*
+import javax.persistence.EnumType.STRING
 import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.Id

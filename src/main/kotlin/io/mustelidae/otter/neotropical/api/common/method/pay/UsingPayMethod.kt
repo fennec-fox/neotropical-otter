@@ -12,7 +12,7 @@ data class UsingPayMethod(
     fun hasCard(): Boolean = (creditCard != null)
 
     @JsonIgnore
-    fun isValid(): Boolean {
+    private fun isValid(): Boolean {
         var count: Int = 0
         if (creditCard != null)
             count++
@@ -24,5 +24,11 @@ data class UsingPayMethod(
             count++
 
         return (count > 0)
+    }
+
+    @JsonIgnore
+    fun validOrThrow() {
+        if (this.isValid().not())
+            throw IllegalArgumentException("There is no payment method available.")
     }
 }

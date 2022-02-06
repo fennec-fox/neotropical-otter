@@ -37,7 +37,8 @@ class Booking(
     val orderId: String,
     val title: String,
     val description: String? = null,
-    val reservationDate: LocalDateTime ? = null
+    val reservationDate: LocalDateTime ? = null,
+    val price: Long? = null
 ) : Audit() {
     @Id
     @GeneratedValue
@@ -116,6 +117,10 @@ class Booking(
         items.add(item)
         if (item.booking != this)
             item.setBy(this)
+    }
+
+    fun getTotalPrice(): Long {
+        return this.items.sumOf { it.getTotalPrice() } + (price ?: 0)
     }
 
     companion object
