@@ -1,6 +1,8 @@
 package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
 
+import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.method.pay.PaymentMethod
+import io.mustelidae.otter.neotropical.api.domain.payment.PaidReceipt
 import java.time.LocalDateTime
 import kotlin.random.Random
 
@@ -89,5 +91,9 @@ class DummyBillingPayClient : BillingPayClient {
             LocalDateTime.now(),
             penaltyAmount
         )
+    }
+
+    override fun findByReceipt(productCode: ProductCode, paymentId: Long): PaidReceipt {
+        TODO("Not yet implemented")
     }
 }

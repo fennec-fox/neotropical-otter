@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar
 import org.springframework.format.support.FormattingConversionService
 import org.springframework.http.converter.HttpMessageConverter
+import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration
@@ -18,6 +19,7 @@ class WebConfiguration() : DelegatingWebMvcConfiguration() {
 
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
         val objectMapper = Jackson.getMapper()
+        converters.add(StringHttpMessageConverter())
         converters.add(MappingJackson2HttpMessageConverter(objectMapper))
         super.configureMessageConverters(converters)
     }
