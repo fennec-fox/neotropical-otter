@@ -62,6 +62,14 @@ class NormalBooking : VerticalBooking {
     }
 
     override fun cancelByItem(cancellationUnit: CancellationUnit, cause: String): ExchangeResult {
+        for(cancelBook in cancellationUnit.cancelBooks){
+            val booking = bookings.find { it.id!! == cancelBook.bookingId }!!
+            if(cancelBook.itemIds != null){
+                TODO()
+            }
+        }
+
+
         TODO("Not yet implemented")
     }
 }
