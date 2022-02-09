@@ -12,6 +12,8 @@ class AppEnvironment {
     class Client {
         var billing = Billing()
         class Billing : ConnInfo()
+        var voucher = Voucher()
+        class Voucher : ConnInfo()
     }
 
     class Product : ConnInfo() {

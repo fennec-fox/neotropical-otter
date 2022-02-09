@@ -7,6 +7,7 @@ import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.Label
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.vertical.CallOffBooking
+import io.mustelidae.otter.neotropical.api.domain.vertical.CancellationUnit
 import io.mustelidae.otter.neotropical.api.domain.vertical.ExchangeResult
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.RecordCard
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.VerticalRecord
@@ -22,7 +23,7 @@ class DummyVerticalClient(
             ExchangeResult(false, "Cancellation is not possible due to testing.")
     }
 
-    override fun cancelByItem(userId: Long, bookingId: Long, itemIds: List<Long>, cause: String): ExchangeResult {
+    override fun cancelByItem(cancellationUnit: CancellationUnit, cause: String): ExchangeResult {
         return if (productEnv.dummyControl.cancelByItem)
             ExchangeResult(true)
         else

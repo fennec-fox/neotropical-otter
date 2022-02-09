@@ -2,7 +2,7 @@ package io.mustelidae.otter.neotropical.api.domain.payment
 
 import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
-import io.mustelidae.otter.neotropical.api.domain.payment.client.voucher.VoucherClient
+import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
 
 class VoucherPayWay : PayWay {
     override val payment: Payment
@@ -36,12 +36,12 @@ class VoucherPayWay : PayWay {
         throw DevelopMistakeException("Voucher payment does not partial cancellation")
     }
 
-    constructor(voucherClient: VoucherClient, payment: Payment) {
+    constructor(payment: Payment, voucherClient: VoucherClient) {
         this.payment = payment
         this.voucherClient = voucherClient
     }
 
-    constructor(voucherClient: VoucherClient, userId: Long, priceOfOrder: Long) {
+    constructor(userId: Long, priceOfOrder: Long, voucherClient: VoucherClient) {
         this.payment = Payment(userId, priceOfOrder, PayWay.Type.VOUCHER)
         this.voucherClient = voucherClient
     }

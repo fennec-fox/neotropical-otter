@@ -21,6 +21,7 @@ enum class ErrorCode(val summary: String) {
     PD01("develop mistake error"),
     PD02("Found that a required value is missing"),
     PL01("duplicate request"),
+    PL02("payment rollback error"),
     PP01("exceed the limit"),
     PP02("There are no items that can be canceled."),
     PP03("Vertical's Policy"),

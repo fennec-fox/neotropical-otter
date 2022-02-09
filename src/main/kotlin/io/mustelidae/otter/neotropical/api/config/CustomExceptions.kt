@@ -3,6 +3,7 @@ package io.mustelidae.otter.neotropical.api.config
 import io.mustelidae.otter.neotropical.api.common.Error
 import io.mustelidae.otter.neotropical.api.common.ErrorCode
 import io.mustelidae.otter.neotropical.api.common.ErrorSource
+import io.mustelidae.otter.neotropical.api.domain.payment.Payment
 
 open class CustomException(val error: ErrorSource) : RuntimeException(error.message)
 
@@ -89,6 +90,34 @@ class CheckoutTimeoutException(message: String) : PolicyException(
         message
     )
 )
+class HandshakeFailException : PolicyException {
+    constructor(userId: Long, payment: Payment, e: CommunicationException) : super(
+        Error(
+            ErrorCode.PL02,
+            "The payment cancellation could not be processed properly. Please contact the customer center.",
+            causeBy = mapOf(
+                "PayError" to e.error.refCode,
+                "userId" to userId,
+                "paymentId" to payment.paymentId,
+                "e" to e.message
+            )
+        )
+    )
+
+    constructor(userId: Long, payment: Payment, message: String?) : super(
+        Error(
+            ErrorCode.PL02,
+            "The payment cancellation could not be processed properly. Please contact the customer center.",
+            causeBy = mapOf(
+                "userId" to userId,
+                "paymentId" to payment.paymentId,
+                "payKey" to payment.payKey,
+                "payType" to payment.payType,
+                "e" to message
+            )
+        )
+    )
+}
 
 /**
  * UnAuthorized Exception

@@ -95,15 +95,15 @@ class BillingPrePayWay : PayWay {
     }
 
     constructor(
-        billingPayClient: BillingPayClient,
         userId: Long,
         priceOfOrder: Long,
+        billingPayClient: BillingPayClient,
     ) {
         this.payment = Payment(userId, priceOfOrder, PayWay.Type.PRE_PAY)
         this.billingPayClient = billingPayClient
     }
 
-    constructor(billingPayClient: BillingPayClient, payment: Payment) {
+    constructor(payment: Payment, billingPayClient: BillingPayClient) {
         this.payment = payment
         this.billingPayClient = billingPayClient
     }

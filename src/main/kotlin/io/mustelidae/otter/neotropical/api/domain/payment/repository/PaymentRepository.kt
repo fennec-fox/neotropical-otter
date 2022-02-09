@@ -1,4 +1,4 @@
-package io.mustelidae.otter.neotropical.api.domain.payment.client.repository
+package io.mustelidae.otter.neotropical.api.domain.payment.repository
 
 import io.mustelidae.otter.neotropical.api.domain.payment.Payment
 import org.springframework.data.jpa.repository.JpaRepository

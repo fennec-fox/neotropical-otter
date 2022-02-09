@@ -71,6 +71,8 @@ app:
   client:
     billing:
       use-dummy: true
+    voucher:
+      use-dummy: true
   products:
     -
       host: localhost

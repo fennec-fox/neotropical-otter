@@ -1,4 +1,4 @@
-package io.mustelidae.otter.neotropical.api.domain.payment.client.voucher
+package io.mustelidae.otter.neotropical.api.domain.payment.voucher.client
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.method.pay.Voucher

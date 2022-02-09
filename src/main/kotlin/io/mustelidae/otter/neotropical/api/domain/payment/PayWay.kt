@@ -3,7 +3,7 @@ package io.mustelidae.otter.neotropical.api.domain.payment
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 
-interface PayWay {
+sealed interface PayWay {
     val payment: Payment
 
     fun addAllBookingToBePay(bookings: List<Booking>) {

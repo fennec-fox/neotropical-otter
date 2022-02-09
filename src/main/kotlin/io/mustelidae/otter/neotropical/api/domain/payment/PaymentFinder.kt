@@ -2,7 +2,7 @@ package io.mustelidae.otter.neotropical.api.domain.payment
 
 import io.mustelidae.otter.neotropical.api.config.DataNotFindException
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
-import io.mustelidae.otter.neotropical.api.domain.payment.client.repository.PaymentRepository
+import io.mustelidae.otter.neotropical.api.domain.payment.repository.PaymentRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

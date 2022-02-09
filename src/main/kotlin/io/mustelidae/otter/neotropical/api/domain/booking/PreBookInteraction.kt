@@ -3,11 +3,15 @@ package io.mustelidae.otter.neotropical.api.domain.booking
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
 import io.mustelidae.otter.neotropical.api.common.method.pay.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.config.CommunicationException
+import io.mustelidae.otter.neotropical.api.config.HandshakeFailException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
+import io.mustelidae.otter.neotropical.api.domain.order.OrderInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.order.repository.OrderSheetRepository
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWay
+import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
+import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,8 +22,11 @@ import java.time.LocalDateTime
 class PreBookInteraction(
     private val bookingFinder: BookingFinder,
     private val bookingRepository: BookingRepository,
+    private val orderInteraction: OrderInteraction,
     private val orderSheetFinder: OrderSheetFinder,
-    private val orderSheetRepository: OrderSheetRepository
+    private val orderSheetRepository: OrderSheetRepository,
+    private val verticalHandler: VerticalHandler,
+    private val payWayHandler: PayWayHandler
 ) {
 
     fun book(orderSheet: OrderSheet, usingPayMethod: UsingPayMethod, adjustmentId: Long?): List<Booking> {
@@ -27,10 +34,26 @@ class PreBookInteraction(
             setUsingPayMethod(usingPayMethod)
             availableOrThrow()
         }
+        val userId = orderSheet.userId
+        val verticalBooking = verticalHandler.getBooking(orderSheet)
+        val adjustmentId = verticalBooking.adjustmentId
+        val amountOfPay = verticalBooking.amountOfPay
 
-        val priceOfOrder = orderSheet.getPriceOfOrder()
+        val payWay = payWayHandler.getPrePayWay(userId, amountOfPay, usingPayMethod.voucher).apply {
+            addAllBookingToBePay(verticalBooking.bookings)
+        }
 
-        TODO()
+        payWay.pay(amountOfPay, orderSheet, adjustmentId)
+
+        bookingRepository.saveAll(verticalBooking.bookings)
+
+        val exchangeResult = verticalBooking.book(orderInteraction)
+
+        if (exchangeResult.isSuccess.not()) {
+            rollbackProgressPayment(userId, payWay)
+        }
+
+        return verticalBooking.bookings
     }
 
     fun completed(bookingIds: List<Long>, policyCards: List<PolicyCard>) {
@@ -45,19 +68,14 @@ class PreBookInteraction(
         bookingRepository.saveAll(bookings)
     }
 
-    private fun rollbackProgressPayment(payWay: PayWay) {
+    private fun rollbackProgressPayment(userId: Long, payWay: PayWay) {
         return try {
             payWay.cancel("Booking not possible due to service issue")
         } catch (e: Exception) {
-            val causeMap = mutableMapOf(
-                "paymentId" to payWay.payment.paymentId!!,
-                "message" to e.message
-            )
-            if (e is CommunicationException) {
-                causeMap["pgErrorCode"] = e.error.refCode
-                causeMap["pgErrorMessage"] = e.error.message
-            }
-            TODO("send to error message")
+            if (e is CommunicationException)
+                throw HandshakeFailException(userId, payWay.payment, e)
+            else
+                throw HandshakeFailException(userId, payWay.payment, e.message)
         }
     }
 }

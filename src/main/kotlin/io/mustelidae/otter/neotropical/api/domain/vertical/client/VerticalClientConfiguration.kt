@@ -1,12 +1,9 @@
-package io.mustelidae.otter.neotropical.api.config.injection
+package io.mustelidae.otter.neotropical.api.domain.vertical.client
 
 import io.mustelidae.otter.neotropical.api.common.ErrorCode
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
-import io.mustelidae.otter.neotropical.api.domain.vertical.client.DummyVerticalClient
-import io.mustelidae.otter.neotropical.api.domain.vertical.client.StableMockUpClient
-import io.mustelidae.otter.neotropical.api.domain.vertical.client.VerticalClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

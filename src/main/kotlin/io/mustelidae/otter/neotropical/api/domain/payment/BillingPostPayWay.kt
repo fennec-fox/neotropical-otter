@@ -43,12 +43,12 @@ class BillingPostPayWay : PayWay {
     }
 
     override fun repay(amountOfRepay: Long, adjustmentId: Long?) {
-        BillingPrePayWay(billingPayClient, payment).repay(amountOfRepay, adjustmentId)
+        BillingPrePayWay(payment, billingPayClient).repay(amountOfRepay, adjustmentId)
     }
 
     override fun cancel(cause: String) {
         if (this.payment.isPaid())
-            BillingPrePayWay(billingPayClient, payment).cancel(cause)
+            BillingPrePayWay(payment, billingPayClient).cancel(cause)
         else {
             this.payment.cancelByChangeOnlyStatus()
         }
@@ -56,7 +56,7 @@ class BillingPostPayWay : PayWay {
 
     override fun cancelWithPenalty(cause: String, amountOfPenalty: Long) {
         if (this.payment.isPaid())
-            BillingPrePayWay(billingPayClient, payment).cancelWithPenalty(cause, amountOfPenalty)
+            BillingPrePayWay(payment, billingPayClient).cancelWithPenalty(cause, amountOfPenalty)
         else {
             this.payment.cancelByChangeOnlyStatus()
         }
@@ -70,15 +70,15 @@ class BillingPostPayWay : PayWay {
         throw DevelopMistakeException("Postpaid payment does not support partial cancellation.")
     }
 
-    constructor(billingPayClient: BillingPayClient, payment: Payment) {
+    constructor(payment: Payment, billingPayClient: BillingPayClient) {
         this.payment = payment
         this.billingPayClient = billingPayClient
     }
 
     constructor(
-        billingPayClient: BillingPayClient,
         userId: Long,
-        priceOfOrder: Long
+        priceOfOrder: Long,
+        billingPayClient: BillingPayClient
     ) {
         this.payment = Payment(userId, priceOfOrder, PayWay.Type.POST_PAY)
         this.billingPayClient = billingPayClient

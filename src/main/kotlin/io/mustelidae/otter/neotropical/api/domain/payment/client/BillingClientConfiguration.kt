@@ -1,4 +1,4 @@
-package io.mustelidae.otter.neotropical.api.config.injection
+package io.mustelidae.otter.neotropical.api.domain.payment.client
 
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
