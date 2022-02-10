@@ -26,12 +26,12 @@ class FreePayWay : PayWay {
         payment.cancelEntire(LocalDateTime.now(), 0)
     }
 
-    override fun cancelPartial(cause: String, partialCanceledAmount: Long) {
-        payment.cancelPartial(LocalDateTime.now(), partialCanceledAmount, 0)
+    override fun cancelPartial(cause: String, partialCancelAmount: Long) {
+        payment.cancelPartial(LocalDateTime.now(), partialCancelAmount, 0)
     }
 
-    override fun cancelPartialWithPenalty(cause: String, partialCanceledAmount: Long, amountOfPenalty: Long) {
-        payment.cancelPartial(LocalDateTime.now(), partialCanceledAmount, 0)
+    override fun cancelPartialWithPenalty(cause: String, partialCancelAmount: Long, amountOfPenalty: Long) {
+        payment.cancelPartial(LocalDateTime.now(), partialCancelAmount, 0)
     }
 
     constructor(payment: Payment) {

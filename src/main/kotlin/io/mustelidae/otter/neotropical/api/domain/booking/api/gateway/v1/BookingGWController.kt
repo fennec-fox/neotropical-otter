@@ -3,11 +3,14 @@ package io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.v1
 import io.mustelidae.otter.neotropical.api.common.Replies
 import io.mustelidae.otter.neotropical.api.common.Reply
 import io.mustelidae.otter.neotropical.api.common.toReplies
+import io.mustelidae.otter.neotropical.api.common.toReply
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingPage
+import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
+import org.bson.types.ObjectId
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
@@ -19,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/gateway")
 class BookingGWController(
     private val bookingFinder: BookingFinder,
-    private val appEnvironment: AppEnvironment
+    private val appEnvironment: AppEnvironment,
+    private val orderSheetFinder: OrderSheetFinder
 ) {
 
     @GetMapping("active-bookings")
@@ -30,7 +34,7 @@ class BookingGWController(
         DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
 
         return bookings.map {
-            val landingPage = LandingPage(it.productCode, it.topicId, appEnvironment)
+            val landingPage = LandingPage(it, appEnvironment)
             GWActiveBookingResources.Reply.ActiveBooking.from(it, landingPage)
         }.toReplies()
     }
@@ -45,7 +49,7 @@ class BookingGWController(
         DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
 
         return bookings.map {
-            val landingPage = LandingPage(it.productCode, it.topicId, appEnvironment)
+            val landingPage = LandingPage(it, appEnvironment)
             GWRecordBookingResources.Reply.Record.from(it, landingPage)
         }.toReplies()
     }
@@ -55,6 +59,17 @@ class BookingGWController(
         @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
         @PathVariable bookingId: Long
     ): Reply<GWRecordBookingResources.Reply.RecordDetail> {
-        TODO()
+        val (booking, verticalRecord, paidReceipt) = bookingFinder.findOneWithItemAndVerticalRecord(bookingId)
+        DataAuthentication(RoleHeader.XUser).validOrThrow(booking)
+        val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(booking.orderId))
+        val landingPage = LandingPage(booking, appEnvironment)
+
+        return GWRecordBookingResources.Reply.RecordDetail.from(
+            orderSheet,
+            booking,
+            verticalRecord,
+            landingPage,
+            paidReceipt
+        ).toReply()
     }
 }

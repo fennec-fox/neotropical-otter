@@ -1,7 +1,5 @@
 package io.mustelidae.otter.neotropical.api.domain.booking
 
-import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
-import io.mustelidae.otter.neotropical.api.common.method.pay.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.config.CommunicationException
 import io.mustelidae.otter.neotropical.api.config.HandshakeFailException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
@@ -11,11 +9,14 @@ import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.order.repository.OrderSheetRepository
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWay
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPaymentMethodClient
+import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
+import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
-import org.bson.types.ObjectId
+import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
+import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -26,15 +27,24 @@ class PreBookInteraction(
     private val orderSheetFinder: OrderSheetFinder,
     private val orderSheetRepository: OrderSheetRepository,
     private val verticalHandler: VerticalHandler,
-    private val payWayHandler: PayWayHandler
+    private val payWayHandler: PayWayHandler,
+    private val billingPaymentMethodClient: BillingPaymentMethodClient,
+    private val voucherClient: VoucherClient
 ) {
 
-    fun book(orderSheet: OrderSheet, usingPayMethod: UsingPayMethod, adjustmentId: Long?): List<Booking> {
+    fun book(orderSheet: OrderSheet, usingPayMethod: UsingPayMethod): List<Booking> {
+        val userId = orderSheet.userId
+
+        usingPayMethod.run {
+            fillUpDetailAll(userId, billingPaymentMethodClient, voucherClient)
+            validOrThrow()
+        }
+
         orderSheet.run {
             setUsingPayMethod(usingPayMethod)
             availableOrThrow()
         }
-        val userId = orderSheet.userId
+
         val verticalBooking = verticalHandler.getBooking(orderSheet)
         val adjustmentId = verticalBooking.adjustmentId
         val amountOfPay = verticalBooking.amountOfPay
@@ -56,14 +66,12 @@ class PreBookInteraction(
         return verticalBooking.bookings
     }
 
-    fun completed(bookingIds: List<Long>, policyCards: List<PolicyCard>) {
+    fun completed(bookingIds: List<Long>) {
         val bookings = bookingFinder.findIn(bookingIds)
+        DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
+
         for (booking in bookings) {
             booking.completed()
-
-            val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(booking.orderId))
-            orderSheet.capture(LocalDateTime.now(), policyCards)
-            orderSheetRepository.save(orderSheet)
         }
         bookingRepository.saveAll(bookings)
     }

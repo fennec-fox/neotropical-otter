@@ -10,6 +10,7 @@ import io.mustelidae.otter.neotropical.api.domain.order.OrderInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.VerticalClient
 import io.mustelidae.otter.neotropical.api.domain.vertical.handshaking.OneWayHandshaking
+import java.time.LocalDateTime
 
 class NormalBooking : VerticalBooking {
     constructor(verticalClient: VerticalClient, orderSheet: OrderSheet) {
@@ -44,6 +45,10 @@ class NormalBooking : VerticalBooking {
                     verticalId = pair.verticalId
                 }
             }
+        }
+
+        exchangeResult.policyCards?.let {
+            orderSheet.capture(LocalDateTime.now(), it)
         }
 
         return exchangeResult

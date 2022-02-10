@@ -1,9 +1,8 @@
 package io.mustelidae.otter.neotropical.api.domain.booking.api
 
-import io.mustelidae.otter.neotropical.api.common.method.pay.CreditCard
-import io.mustelidae.otter.neotropical.api.common.method.pay.DiscountCoupon
-import io.mustelidae.otter.neotropical.api.common.method.pay.Point
-import io.mustelidae.otter.neotropical.api.common.method.pay.Voucher
+import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
+import io.mustelidae.otter.neotropical.api.domain.payment.method.DiscountCoupon
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 
 class BookingResources {
 
@@ -11,9 +10,9 @@ class BookingResources {
 
         data class PrePayBook(
             val orderId: String,
-            val creditCard: CreditCard? = null,
-            val point: Point? = null,
-            val discountCoupon: DiscountCoupon? = null,
+            val payKey: String? = null,
+            val point: Long? = null,
+            val discountCoupon: Coupon? = null,
             val voucher: Voucher? = null,
             val adjustmentId: Long? = null
         )
@@ -26,5 +25,17 @@ class BookingResources {
             val voucher: Voucher? = null,
             val adjustmentId: Long? = null
         )
+
+        data class Voucher(
+            val id: Long,
+            val groupId: Long? = null
+        )
+
+        data class Coupon(
+            val id: Long,
+            val groupId: Long? = null
+        )
+
+        companion object
     }
 }

@@ -2,8 +2,11 @@ package io.mustelidae.otter.neotropical.api.domain.payment.client
 
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPaymentMethodClient
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.DummyBillingPayClient
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.DummyBillingPaymentMethodClient
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.StableBillingPayClient
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.StableBillingPaymentMethodClient
 import io.netty.channel.ChannelOption
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -35,5 +38,15 @@ class BillingClientConfiguration(
 
             StableBillingPayClient(webClient)
         }
+    }
+
+    @Bean
+    fun billingPaymentMethodClient(): BillingPaymentMethodClient {
+        val billingEnv = appEnvironment.client.billing
+
+        return if (billingEnv.useDummy)
+            DummyBillingPaymentMethodClient()
+        else
+            StableBillingPaymentMethodClient()
     }
 }

@@ -5,16 +5,20 @@ import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.DisplayCard
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.ImageCard
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
-import io.mustelidae.otter.neotropical.api.common.method.pay.PaidCreditCard
-import io.mustelidae.otter.neotropical.api.common.method.pay.PaidDiscountCoupon
-import io.mustelidae.otter.neotropical.api.common.method.pay.PaidPoint
-import io.mustelidae.otter.neotropical.api.common.method.pay.PaymentMethod
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.ApiModelType
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.Label
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingPage
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingWay
+import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
+import io.mustelidae.otter.neotropical.api.domain.payment.PaidReceipt
 import io.mustelidae.otter.neotropical.api.domain.payment.Payment
+import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidCreditCard
+import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidDiscountCoupon
+import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidPoint
+import io.mustelidae.otter.neotropical.api.domain.payment.method.PaymentMethod
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
+import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.VerticalRecord
 import java.time.LocalDateTime
 
 class GWRecordBookingResources {
@@ -101,22 +105,110 @@ class GWRecordBookingResources {
             val productDefineField: Map<String, Any?>? = null
         ) {
             data class Detail(
-                val displayCards: List<DisplayCard>,
-                val imageCards: List<ImageCard>,
-                val policyCards: List<PolicyCard>
-            )
+                val displayCards: List<DisplayCard>? = null,
+                val imageCards: List<ImageCard>? = null,
+                val policyCards: List<PolicyCard>? = null
+            ) {
+                companion object {
+                    fun from(orderSheet: OrderSheet, verticalRecord: VerticalRecord): Detail {
+                        var policyCards = orderSheet.policyCapture?.snapShotPolicyCards
+
+                        if (policyCards == null)
+                            policyCards = verticalRecord.recordCard.policyCard
+
+                        return Detail(
+                            verticalRecord.recordCard.displayCards,
+                            verticalRecord.recordCard.imageCards,
+                            policyCards
+                        )
+                    }
+                }
+            }
 
             data class PaymentReceipt(
                 val totalPaidAmount: Long,
-                val paidDate: LocalDateTime,
+                val paidDate: LocalDateTime? = null,
                 val creditCard: PaidCreditCard? = null,
                 val point: PaidPoint? = null,
                 val discountCoupon: PaidDiscountCoupon? = null,
-                val voucherId: Long? = null,
+                val voucher: Voucher? = null,
 
                 val totalRefundAmount: Long? = null,
                 val canceledDate: LocalDateTime? = null,
-            )
+            ) {
+                companion object {
+                    fun from(orderSheet: OrderSheet, payment: Payment, paidReceipt: PaidReceipt?): PaymentReceipt {
+                        val voucher = orderSheet.estimateUsingPayMethod?.voucher
+
+                        @Suppress("IfThenToElvis")
+                        return if (paidReceipt != null) {
+                            paidReceipt.run {
+                                PaymentReceipt(
+                                    paidAmount,
+                                    paidDate,
+                                    creditCard,
+                                    point,
+                                    discountCoupon,
+                                    voucher,
+                                    refundAmount,
+                                    canceledDate
+                                )
+                            }
+                        } else {
+                            payment.run {
+                                PaymentReceipt(
+                                    paidAmount ?: 0,
+                                    paidDate,
+                                    null,
+                                    null,
+                                    null,
+                                    voucher,
+                                    refundAmount,
+                                    cancelledDate
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            companion object {
+                fun from(
+                    orderSheet: OrderSheet,
+                    booking: Booking,
+                    verticalRecord: VerticalRecord,
+                    landingPage: LandingPage,
+                    paidReceipt: PaidReceipt?
+                ): RecordDetail {
+                    return booking.run {
+
+                        val color = when (booking.status) {
+                            Booking.Status.WAIT -> Label.Color.YELLOW
+                            Booking.Status.BOOKED -> Label.Color.BLUE
+                            Booking.Status.COMPLETED -> Label.Color.GRAY
+                            Booking.Status.CANCELED -> Label.Color.RED
+                        }
+
+                        RecordDetail(
+                            id!!,
+                            createdAt!!,
+                            productCode,
+                            topicId,
+                            modifiedAt!!,
+                            title,
+                            ApiModelType.BOOKING,
+                            Label(status.text, false, color),
+                            landingPage.getLandingWay(),
+                            !isHide,
+                            landingPage.getRecordDetail(),
+                            getContent() ?: emptyList(),
+                            PaymentReceipt.from(orderSheet, booking.payment!!, paidReceipt),
+                            Detail.from(orderSheet, verticalRecord),
+                            verticalRecord.preDefineField
+                        )
+                    }
+                }
+            }
         }
     }
 }

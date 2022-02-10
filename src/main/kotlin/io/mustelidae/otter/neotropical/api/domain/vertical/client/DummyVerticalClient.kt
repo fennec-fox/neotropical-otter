@@ -1,6 +1,8 @@
 package io.mustelidae.otter.neotropical.api.domain.vertical.client
 
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.DisplayCard
+import io.mustelidae.otter.neotropical.api.common.design.v1.component.ImageCard
+import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
@@ -37,6 +39,21 @@ class DummyVerticalClient(
             Label("Completed!!", true, Label.Color.RED),
             RecordCard(
                 listOf(
+                    PolicyCard(
+                        1,
+                        "policy",
+                        listOf(
+                            PolicyCard.Explanation(
+                                1,
+                                "explan",
+                                "bla bla"
+                            )
+                        ),
+                        false,
+                        showOnlyAdmin = false
+                    )
+                ),
+                listOf(
                     DisplayCard(
                         1,
                         "service",
@@ -66,9 +83,27 @@ class DummyVerticalClient(
                             )
                         )
                     )
+                ),
+                listOf(
+                    ImageCard(
+                        1, "Logo!",
+                        listOf(
+                            ImageCard.Image(1, "https://sk.com/lib/images/desktop/logo.png", "https://sk.com/lib/images/desktop/logo.png", "SK 로고"),
+                            ImageCard.Image(2, "http://www.skenergy.com/images/common/logo_main.png", "SK 에너지 로고")
+                        )
+                    ),
+                    ImageCard(
+                        2, null,
+                        listOf(
+                            ImageCard.Image(1, "https://sk.com/lib/images/desktop/logo.png", null)
+                        )
+                    ),
                 )
             ),
-            null
+            mapOf(
+                Pair("testA", "It's good day to die!"),
+                Pair("testList", listOf("hello", "world!"))
+            )
         )
     }
 

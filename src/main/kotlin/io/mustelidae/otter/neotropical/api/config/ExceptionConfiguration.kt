@@ -135,6 +135,16 @@ class ExceptionConfiguration(
         return errorForm(request, e, e.error)
     }
 
+    @ExceptionHandler(value = [PermissionException::class])
+    @ResponseStatus(UNAUTHORIZED)
+    @ResponseBody
+    fun permissionException(
+        e: PermissionException,
+        request: HttpServletRequest
+    ): Map<String, Any> {
+        return errorForm(request, e, e.error)
+    }
+
     /**
      * unauthorized
      */

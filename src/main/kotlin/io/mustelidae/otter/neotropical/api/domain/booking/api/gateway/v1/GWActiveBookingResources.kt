@@ -29,6 +29,9 @@ class GWActiveBookingResources {
         ) {
             companion object {
                 fun from(booking: Booking, landingPage: LandingPage): ActiveBooking {
+                    val contents = booking.getContent() ?: listOf(
+                        SimpleContent(Label("title"), listOf(booking.title))
+                    )
                     return booking.run {
                         ActiveBooking(
                             id!!,
@@ -45,7 +48,7 @@ class GWActiveBookingResources {
                             landingPage.getLandingWay(),
                             false,
                             landingPage.getActiveDetail()!!,
-                            booking.getContent()!!
+                            contents
                         )
                     }
                 }

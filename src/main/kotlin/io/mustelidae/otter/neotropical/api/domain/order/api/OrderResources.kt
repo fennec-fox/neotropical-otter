@@ -110,7 +110,7 @@ class OrderResources {
                             userId,
                             productCode,
                             topicId,
-                            products.map { PurchaseOrder.OrderedProduct.from(it) },
+                            products.map { OrderedProduct.from(it) },
                             adjustmentId,
                             status,
                             getPrivacy(),

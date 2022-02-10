@@ -1,9 +1,11 @@
 package io.mustelidae.otter.neotropical.api.domain.payment.voucher.client
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
-import io.mustelidae.otter.neotropical.api.common.method.pay.Voucher
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 
 interface VoucherClient {
+
+    fun findById(userId: Long, voucherId: Long, groupId: Long?): VoucherClientResources.Reply.Detail
 
     fun use(userId: Long, productCode: ProductCode, topicId: String, voucher: Voucher)
 

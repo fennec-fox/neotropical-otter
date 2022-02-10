@@ -1,7 +1,7 @@
 package io.mustelidae.otter.neotropical.api.domain.payment
 
-import io.mustelidae.otter.neotropical.api.common.method.pay.Voucher
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
 import org.springframework.stereotype.Service
 

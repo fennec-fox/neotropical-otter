@@ -30,7 +30,7 @@ class VerticalHandler(
         }
     }
 
-    private fun getClient(productCode: ProductCode): VerticalClient {
+    fun getClient(productCode: ProductCode): VerticalClient {
 
         return when (productCode) {
             ProductCode.MOCK_UP -> {

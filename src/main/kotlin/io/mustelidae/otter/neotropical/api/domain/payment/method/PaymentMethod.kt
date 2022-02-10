@@ -1,4 +1,4 @@
-package io.mustelidae.otter.neotropical.api.common.method.pay
+package io.mustelidae.otter.neotropical.api.domain.payment.method
 
 enum class PaymentMethod {
     CARD,

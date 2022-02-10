@@ -4,8 +4,8 @@ import io.mustelidae.otter.neotropical.api.common.Privacy
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
-import io.mustelidae.otter.neotropical.api.common.method.pay.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.config.CheckoutTimeoutException
+import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
 import io.mustelidae.otter.neotropical.utils.Crypto
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id

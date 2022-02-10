@@ -2,12 +2,16 @@ package io.mustelidae.otter.neotropical.api.domain.booking.api
 
 import io.mustelidae.otter.neotropical.api.common.Replies
 import io.mustelidae.otter.neotropical.api.common.Reply
-import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
-import io.mustelidae.otter.neotropical.api.common.method.pay.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.common.toReplies
 import io.mustelidae.otter.neotropical.api.common.toReply
+import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.booking.PreBookInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
+import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
+import io.mustelidae.otter.neotropical.api.domain.payment.method.DiscountCoupon
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Point
+import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.lock.EnableUserLock
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
@@ -24,13 +28,14 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/bookings")
 class PrePayBookingController(
     private val orderSheetFinder: OrderSheetFinder,
-    private val preBookingInteraction: PreBookInteraction
+    private val preBookingInteraction: PreBookInteraction,
+    private val bookingFinder: BookingFinder,
 ) {
 
     @PostMapping("pre-pay-book")
     @EnableUserLock
     fun book(
-        @RequestHeader userId: Long,
+        @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
         @RequestBody request: BookingResources.Request.PrePayBook
     ): Replies<Long> {
         val orderId = ObjectId(request.orderId)
@@ -38,13 +43,13 @@ class PrePayBookingController(
         DataAuthentication(RoleHeader.XUser).validOrThrow(orderSheet)
 
         val usingPayMethod = UsingPayMethod(
-            request.creditCard,
-            request.point,
-            request.discountCoupon,
-            request.voucher
+            request.payKey?.let { CreditCard(it) },
+            request.point?.let { Point(it) },
+            request.discountCoupon?.let { DiscountCoupon(it.id, it.groupId) },
+            request.voucher?.let { Voucher(it.id, it.groupId) }
         )
 
-        val bookings = preBookingInteraction.book(orderSheet, usingPayMethod, request.adjustmentId)
+        val bookings = preBookingInteraction.book(orderSheet, usingPayMethod)
 
         return bookings.map { it.id!! }
             .toReplies()
@@ -52,11 +57,9 @@ class PrePayBookingController(
 
     @PutMapping("{bookingIds}")
     fun complete(
-        @PathVariable bookingIds: List<Long>,
-        @RequestBody policyCards: List<PolicyCard>
+        @PathVariable bookingIds: List<Long>
     ): Reply<Unit> {
-        DataAuthentication(RoleHeader.XSystem)
-        preBookingInteraction.completed(bookingIds, policyCards)
+        preBookingInteraction.completed(bookingIds)
         return Unit.toReply()
     }
 }

@@ -4,6 +4,11 @@ import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.config.DataNotFindException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingDSLRepository
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
+import io.mustelidae.otter.neotropical.api.domain.payment.PaidReceipt
+import io.mustelidae.otter.neotropical.api.domain.payment.PayWay
+import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
+import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
+import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.VerticalRecord
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional
 class BookingFinder
 @Autowired constructor(
     private val bookingDSLRepository: BookingDSLRepository,
-    private val bookingRepository: BookingRepository
+    private val bookingRepository: BookingRepository,
+    private val verticalHandler: VerticalHandler,
+    private val billingPayClient: BillingPayClient
 ) {
 
     fun findIn(bookingIds: List<Long>): List<Booking> {
@@ -46,6 +53,21 @@ class BookingFinder
         bookingId: Long
     ): Booking {
         return bookingDSLRepository.findOne(bookingId) ?: throw DataNotFindException(bookingId, "Booking does not exist.")
+    }
+
+    fun findOneWithItemAndVerticalRecord(
+        bookingId: Long
+    ): Triple<Booking, VerticalRecord, PaidReceipt?> {
+        val booking = this.findOneWithItem(bookingId)
+        val productCode = booking.productCode
+        val verticalRecord = verticalHandler.getClient(productCode).findRecord(bookingId)
+
+        val paidReceipt = when (booking.payment!!.payType) {
+            PayWay.Type.POST_PAY, PayWay.Type.PRE_PAY -> billingPayClient.findByReceipt(productCode, booking.payment!!.id!!)
+            else -> null
+        }
+
+        return Triple(booking, verticalRecord, paidReceipt)
     }
 
     fun findRecentUsage(

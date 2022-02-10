@@ -1,10 +1,10 @@
 package io.mustelidae.otter.neotropical.api.domain.payment
 
 import io.mustelidae.otter.neotropical.api.common.Audit
-import io.mustelidae.otter.neotropical.api.common.method.pay.PaymentMethod
-import io.mustelidae.otter.neotropical.api.common.method.pay.Voucher
 import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
+import io.mustelidae.otter.neotropical.api.domain.payment.method.PaymentMethod
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
 import javax.persistence.Column

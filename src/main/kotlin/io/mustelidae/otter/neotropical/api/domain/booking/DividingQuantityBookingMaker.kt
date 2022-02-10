@@ -29,7 +29,9 @@ class DividingQuantityBookingMaker(
             product.description,
             product.reservationDate,
             product.price
-        )
+        ).apply {
+            setContent(product.contents)
+        }
         product.goods?.flatMap { make(it) }?.forEach { booking.addBy(it) }
         return booking
     }

@@ -1,7 +1,8 @@
 package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
 
 import io.mustelidae.otter.neotropical.api.common.ErrorSource
-import io.mustelidae.otter.neotropical.api.common.method.pay.PaymentMethod
+import io.mustelidae.otter.neotropical.api.common.ProductCode
+import io.mustelidae.otter.neotropical.api.domain.payment.method.PaymentMethod
 import java.time.LocalDateTime
 
 class BillingClientResources {
@@ -36,5 +37,28 @@ class BillingClientResources {
         ) : ErrorSource {
             var pgMessage: String? = null
         }
+
+        data class CardDetail(
+            val id: Long,
+            val payKey: String,
+            val name: String,
+            val number: String,
+            val corp: String,
+            val isPrimary: Boolean,
+            val status: Boolean,
+            val nickName: String? = null,
+            val usingProductCode: ProductCode? = null
+        )
+
+        data class CouponDetail(
+            val id: Long,
+            val name: String,
+            val discountAmount: Long,
+            val status: Boolean,
+            val condition: String? = null,
+            val startDate: LocalDateTime? = null,
+            val endDate: LocalDateTime? = null,
+            val groupId: Long? = null,
+        )
     }
 }

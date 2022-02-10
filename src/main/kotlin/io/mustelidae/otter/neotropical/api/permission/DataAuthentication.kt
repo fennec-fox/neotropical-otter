@@ -30,8 +30,8 @@ class DataAuthentication(
     fun validOrThrow(bookings: List<Booking>) {
         for (permission in permissions) {
             for (booking in bookings) {
-                permission.checkBooking(booking).not()
-                throw PermissionException()
+                if (permission.checkBooking(booking).not())
+                    throw PermissionException()
             }
         }
     }
