@@ -1,10 +1,10 @@
 package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
-import io.mustelidae.otter.neotropical.api.domain.payment.PaidReceipt
 import io.mustelidae.otter.neotropical.api.common.method.PaidCreditCard
 import io.mustelidae.otter.neotropical.api.common.method.PaidDiscountCoupon
 import io.mustelidae.otter.neotropical.api.common.method.PaidPoint
+import io.mustelidae.otter.neotropical.api.domain.payment.PaidReceipt
 import io.mustelidae.otter.neotropical.api.domain.payment.method.PaymentMethod
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -15,18 +15,35 @@ class DummyBillingPayClient : BillingPayClient {
 
     override fun pay(userId: Long, payPayload: PayPayload): BillingClientResources.Reply.PaidResult {
 
-        val methods = mutableListOf(
-            BillingClientResources.Reply.MethodAmountPair(
-                PaymentMethod.CARD,
-                payPayload.amountOfPay - (payPayload.usingPayMethod.point?.amount ?: 0)
-            )
-        )
+        val methods = mutableListOf<BillingClientResources.Reply.MethodAmountPair>()
+        var remainAmount = payPayload.amountOfPay
 
-        if (payPayload.usingPayMethod.point != null) {
+        payPayload.usingPayMethod.discountCoupon?.let {
+            remainAmount -= it.discountAmount!!
+
+            methods.add(
+                BillingClientResources.Reply.MethodAmountPair(
+                    PaymentMethod.DISCOUNT_COUPON,
+                    it.discountAmount!!
+                )
+            )
+        }
+
+        payPayload.usingPayMethod.point?.let {
+            remainAmount -= it.amount
             methods.add(
                 BillingClientResources.Reply.MethodAmountPair(
                     PaymentMethod.POINT,
-                    (payPayload.usingPayMethod.point?.amount!!)
+                    (it.amount)
+                )
+            )
+        }
+
+        if (remainAmount > 0) {
+            methods.add(
+                BillingClientResources.Reply.MethodAmountPair(
+                    PaymentMethod.CARD,
+                    remainAmount
                 )
             )
         }
@@ -185,8 +202,8 @@ class DummyBillingPayClient : BillingPayClient {
             credit,
             point,
             discountCoupon,
-            raw.refundAmount,
-            LocalDateTime.now()
+            if (raw.isCancel) raw.refundAmount else null,
+            if (raw.isCancel) LocalDateTime.now() else null
         )
     }
 

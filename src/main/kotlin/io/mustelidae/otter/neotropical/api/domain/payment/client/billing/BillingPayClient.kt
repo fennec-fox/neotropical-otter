@@ -7,7 +7,7 @@ interface BillingPayClient {
 
     fun pay(userId: Long, payPayload: PayPayload): BillingClientResources.Reply.PaidResult
 
-    fun repay(userId: Long,billPayId: Long, amountOfPay: Long, adjustmentId: Long?): BillingClientResources.Reply.PaidResult
+    fun repay(userId: Long, billPayId: Long, amountOfPay: Long, adjustmentId: Long?): BillingClientResources.Reply.PaidResult
 
     fun cancelEntire(
         userId: Long,

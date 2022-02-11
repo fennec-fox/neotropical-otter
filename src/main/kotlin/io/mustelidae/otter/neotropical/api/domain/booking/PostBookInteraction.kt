@@ -1,40 +1,41 @@
 package io.mustelidae.otter.neotropical.api.domain.booking
 
-import io.mustelidae.otter.neotropical.api.config.CommunicationException
 import io.mustelidae.otter.neotropical.api.config.HandshakeFailException
+import io.mustelidae.otter.neotropical.api.config.InvalidArgumentException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
 import io.mustelidae.otter.neotropical.api.domain.order.OrderInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
-import io.mustelidae.otter.neotropical.api.domain.payment.PayWay
+import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
+import io.mustelidae.otter.neotropical.api.domain.order.repository.OrderSheetRepository
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
-import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPaymentMethodClient
+import io.mustelidae.otter.neotropical.api.domain.payment.PaymentMethodCalibration
 import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
-import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.mustelidae.otter.neotropical.utils.sameOrThrow
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class PreBookInteraction(
+class PostBookInteraction(
     private val bookingFinder: BookingFinder,
     private val bookingRepository: BookingRepository,
     private val orderInteraction: OrderInteraction,
+    private val orderSheetFinder: OrderSheetFinder,
+    private val orderSheetRepository: OrderSheetRepository,
     private val verticalHandler: VerticalHandler,
     private val payWayHandler: PayWayHandler,
-    private val billingPaymentMethodClient: BillingPaymentMethodClient,
-    private val voucherClient: VoucherClient
+    private val paymentMethodCalibration: PaymentMethodCalibration
 ) {
 
     fun book(orderSheet: OrderSheet, usingPayMethod: UsingPayMethod): List<Booking> {
         val userId = orderSheet.userId
-
         usingPayMethod.run {
-            fillUpDetailAll(userId, billingPaymentMethodClient, voucherClient)
-            validOrThrow()
+            if (this.hasCard().not())
+                throw InvalidArgumentException("Postpaid orders require a card.")
         }
 
         orderSheet.run {
@@ -43,46 +44,53 @@ class PreBookInteraction(
         }
 
         val verticalBooking = verticalHandler.getBooking(orderSheet)
-        val adjustmentId = verticalBooking.adjustmentId
         val amountOfPay = verticalBooking.amountOfPay
 
-        val payWay = payWayHandler.getPrePayWay(userId, amountOfPay, usingPayMethod.voucher).apply {
+        payWayHandler.getPostPayWay(userId, amountOfPay).apply {
             addAllBookingToBePay(verticalBooking.bookings)
         }
 
-        payWay.pay(amountOfPay, orderSheet, adjustmentId)
-
         bookingRepository.saveAll(verticalBooking.bookings)
-
         val exchangeResult = verticalBooking.book(orderInteraction)
 
-        if (exchangeResult.isSuccess.not()) {
-            rollbackProgressPayment(userId, payWay)
-        }
+        if (exchangeResult.isSuccess.not())
+            throw HandshakeFailException(userId, orderSheet.productCode, exchangeResult.failCause)
+
+        bookingRepository.saveAll(verticalBooking.bookings)
+        orderSheetRepository.save(orderSheet)
 
         return verticalBooking.bookings
     }
 
-    fun completed(bookingIds: List<Long>) {
+    fun completed(
+        bookingIds: List<Long>,
+        changeAmount: Long? = null,
+        changeAdjustmentId: Long? = null,
+        cause: String? = null,
+        changePaymentMethod: UsingPayMethod? = null
+    ) {
         val bookings = bookingFinder.findIn(bookingIds).apply {
             sameOrThrow()
         }
         DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
 
-        for (booking in bookings) {
-            booking.completed()
-        }
-        bookingRepository.saveAll(bookings)
-    }
+        val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(bookings.first().orderId))
+        val userId = orderSheet.userId
+        val payment = bookings.first().payment!!
+        val amountOfPay = changeAmount ?: payment.priceOfOrder
+        val adjustmentId = changeAdjustmentId ?: orderSheet.adjustmentId
+        val usingPayMethod = paymentMethodCalibration.calibrate(userId, orderSheet, changePaymentMethod)
 
-    private fun rollbackProgressPayment(userId: Long, payWay: PayWay) {
-        return try {
-            payWay.cancel("Booking not possible due to service issue")
-        } catch (e: Exception) {
-            if (e is CommunicationException)
-                throw HandshakeFailException(userId, payWay.payment, e)
-            else
-                throw HandshakeFailException(userId, payWay.payment, e.message)
+        orderSheet.changeUsingPayMethod(usingPayMethod)
+
+        bookings.forEach {
+            it.completed()
         }
+
+        val payWay = payWayHandler.getPostPayWay(payment, changeAmount)
+        payWay.pay(amountOfPay, orderSheet, adjustmentId)
+
+        bookingRepository.saveAll(bookings)
+        orderSheetRepository.save(orderSheet)
     }
 }

@@ -10,8 +10,7 @@ fun BookingResources.Request.Companion.aFixturePrePayOfOnlyCredit(orderId: Strin
         "24273420fs3r2",
         null,
         null,
-        null,
-        1
+        null
     )
 }
 
@@ -21,8 +20,7 @@ fun BookingResources.Request.Companion.aFixturePrePayOfVoucher(orderId: String):
         null,
         null,
         null,
-        BookingResources.Request.Voucher(Random.nextLong(), Random.nextLong()),
-        2
+        BookingResources.Request.Voucher(Random.nextLong(), Random.nextLong())
     )
 }
 
@@ -32,8 +30,7 @@ fun BookingResources.Request.Companion.aFixturePrePayOfCreditWithPoint(orderId: 
         "23423523422",
         1000,
         null,
-        null,
-        3
+        null
     )
 }
 
@@ -42,9 +39,8 @@ fun BookingResources.Request.Companion.aFixturePrePayOfPointDiscount(orderId: St
         orderId,
         null,
         2000,
-        BookingResources.Request.Coupon(Random.nextLong(), Random.nextLong()),
-        null,
-        4
+        BookingResources.Request.Coupon(3),
+        null
     )
 }
 
@@ -53,8 +49,17 @@ fun BookingResources.Request.Companion.aFixturePrePayOfCreditDiscount(orderId: S
         orderId,
         "23423527s3427",
         null,
-        BookingResources.Request.Coupon(Random.nextLong(), Random.nextLong()),
+        BookingResources.Request.Coupon(1),
+        null
+    )
+}
+
+fun BookingResources.Request.Companion.aFixturePostPayOfCredit(orderId: String): BookingResources.Request.PostPayBook {
+    return BookingResources.Request.PostPayBook(
+        orderId,
+        "jr32o0873whc",
         null,
-        5
+        null,
+        null
     )
 }

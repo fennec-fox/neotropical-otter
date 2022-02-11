@@ -26,7 +26,7 @@ import javax.persistence.Table
 )
 class Payment(
     val userId: Long,
-    val priceOfOrder: Long,
+    var priceOfOrder: Long,
     @Enumerated(STRING)
     val payType: PayWay.Type
 ) : Audit() {

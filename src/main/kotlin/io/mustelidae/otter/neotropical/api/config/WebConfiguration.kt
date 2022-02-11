@@ -1,5 +1,6 @@
 package io.mustelidae.otter.neotropical.api.config
 
+import io.mustelidae.otter.neotropical.api.lock.UserLockInterceptor
 import io.mustelidae.otter.neotropical.utils.Jackson
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
@@ -11,11 +12,19 @@ import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import java.time.format.DateTimeFormatter
 
 @Configuration
 @ControllerAdvice
-class WebConfiguration() : DelegatingWebMvcConfiguration() {
+class WebConfiguration(
+    private val userLockInterceptor: UserLockInterceptor
+) : DelegatingWebMvcConfiguration() {
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(userLockInterceptor)
+        super.addInterceptors(registry)
+    }
 
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
         val objectMapper = Jackson.getMapper()

@@ -2,9 +2,9 @@ package io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.v1
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
+import io.mustelidae.otter.neotropical.api.common.design.v1.component.Label
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.ApiModelType
-import io.mustelidae.otter.neotropical.api.common.design.v1.component.Label
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingPage
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingWay
 import java.time.LocalDateTime

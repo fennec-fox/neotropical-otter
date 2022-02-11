@@ -17,7 +17,8 @@ open class DiscountCoupon(
     @Transient
     override var isValid: Boolean = true
     @Transient
-    override val paymentMethod: PaymentMethod = PaymentMethod.DISCOUNT_COUPON
+    override var paymentMethod: PaymentMethod = PaymentMethod.DISCOUNT_COUPON
+        protected set
 
     @JsonIgnore
     fun fillUpDetail(userId: Long, billingPaymentMethodClient: BillingPaymentMethodClient) {

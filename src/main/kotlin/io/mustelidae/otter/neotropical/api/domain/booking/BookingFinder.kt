@@ -5,7 +5,6 @@ import io.mustelidae.otter.neotropical.api.config.DataNotFindException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingDSLRepository
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
-import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,12 +15,11 @@ class BookingFinder
 @Autowired constructor(
     private val bookingDSLRepository: BookingDSLRepository,
     private val bookingRepository: BookingRepository,
-    private val verticalHandler: VerticalHandler,
     private val billingPayClient: BillingPayClient
 ) {
 
     fun findIn(bookingIds: List<Long>): List<Booking> {
-        val bookings = bookingRepository.findAllById(bookingIds)
+        val bookings = bookingDSLRepository.findAllByIdWithPayment(bookingIds) ?: emptyList()
         if (bookings.size != bookingIds.size)
             throw DataNotFindException("Couldn't find all the booking for the requested ID.")
 

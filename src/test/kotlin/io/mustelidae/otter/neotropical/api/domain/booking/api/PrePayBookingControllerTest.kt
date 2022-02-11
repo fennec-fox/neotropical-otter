@@ -16,26 +16,6 @@ import org.junit.jupiter.api.Test
 internal class PrePayBookingControllerTest : FlowTestSupport() {
 
     @Test
-    fun bookingByOnlyCreditCard() {
-        // Given
-        val userId = 34702372L
-        val productCode = ProductCode.MOCK_UP
-        val topicId = Topic.topicMap[productCode]!!.first()
-        val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
-        val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
-        val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
-
-        // When
-        val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
-        val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
-        val bookingRequest = BookingResources.Request.aFixturePrePayOfOnlyCredit(orderId)
-        val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
-        // Then
-        val activeBookings = bookingGWFlow.activeBookings()
-        activeBookings.size shouldBe bookingIds.size
-    }
-
-    @Test
     fun completeBookingByCreditCardAndPoint() {
         // Given
         val userId = 427325304L
@@ -93,6 +73,9 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
             it.receipt.creditCard shouldNotBe null
             it.receipt.point shouldBe null
             it.receipt.voucher shouldBe null
+            it.receipt.discountCoupon shouldBe null
+            it.receipt.canceledDate shouldBe null
+            it.receipt.paidDate shouldNotBe null
         }
     }
 
@@ -127,6 +110,83 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
             it.receipt.creditCard shouldBe null
             it.receipt.point shouldBe null
             it.receipt.voucher shouldNotBe null
+            it.receipt.discountCoupon shouldBe null
+            it.receipt.canceledDate shouldBe null
+            it.receipt.paidDate shouldNotBe null
+        }
+    }
+
+    @Test
+    fun completedBookingRecordByPointAndDiscount() {
+        // Given
+        val userId = 31742379324L
+        val productCode = ProductCode.MOCK_UP
+        val topicId = Topic.topicMap[productCode]!!.first()
+        val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
+        val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
+        val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+
+        // When
+        val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
+        val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
+        val bookingRequest = BookingResources.Request.aFixturePrePayOfPointDiscount(orderId)
+        val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
+        val targetBookingId = bookingIds.first()
+
+        prePayBookingFlow.complete(productCode, listOf(targetBookingId))
+
+        // Then
+        val detail = bookingGWFlow.recordDetail(targetBookingId)
+
+        detail.landingPath shouldNotBe null
+
+        detail.asClue {
+            it.productCode shouldBe productCode
+            it.landingType shouldBe LandingWay.WEB_VIEW
+            it.title shouldBe checkoutRequest.products.first().title
+            it.receipt.creditCard shouldBe null
+            it.receipt.point shouldNotBe null
+            it.receipt.discountCoupon shouldNotBe null
+            it.receipt.voucher shouldBe null
+            it.receipt.canceledDate shouldBe null
+            it.receipt.paidDate shouldNotBe null
+        }
+    }
+
+    @Test
+    fun completedBookingRecordByCreditAndDiscount() {
+        // Given
+        val userId = 472347234L
+        val productCode = ProductCode.MOCK_UP
+        val topicId = Topic.topicMap[productCode]!!.first()
+        val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
+        val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
+        val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+
+        // When
+        val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
+        val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
+        val bookingRequest = BookingResources.Request.aFixturePrePayOfCreditDiscount(orderId)
+        val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
+        val targetBookingId = bookingIds.first()
+
+        prePayBookingFlow.complete(productCode, listOf(targetBookingId))
+
+        // Then
+        val detail = bookingGWFlow.recordDetail(targetBookingId)
+
+        detail.landingPath shouldNotBe null
+
+        detail.asClue {
+            it.productCode shouldBe productCode
+            it.landingType shouldBe LandingWay.WEB_VIEW
+            it.title shouldBe checkoutRequest.products.first().title
+            it.receipt.creditCard shouldNotBe null
+            it.receipt.point shouldBe null
+            it.receipt.discountCoupon shouldNotBe null
+            it.receipt.voucher shouldBe null
+            it.receipt.canceledDate shouldBe null
+            it.receipt.paidDate shouldNotBe null
         }
     }
 }

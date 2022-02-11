@@ -60,6 +60,8 @@ dependencies {
 
     testImplementation("com.h2database:h2")
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.3.0")
+    testImplementation("org.testcontainers:testcontainers:1.16.3")
+
     runtimeOnly("mysql:mysql-connector-java:8.0.25")
 
 }

@@ -12,4 +12,8 @@ class StableBillingPaymentMethodClient : BillingPaymentMethodClient {
     ): BillingClientResources.Reply.CouponDetail {
         TODO("Not yet implemented")
     }
+
+    override fun findAvailableCard(userId: Long): BillingClientResources.Reply.CardDetail {
+        TODO("Not yet implemented")
+    }
 }

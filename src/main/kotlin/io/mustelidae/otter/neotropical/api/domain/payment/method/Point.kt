@@ -4,7 +4,8 @@ open class Point(
     open val amount: Long
 ) : PayMethod {
     @Transient
-    override val paymentMethod: PaymentMethod = PaymentMethod.POINT
+    override var paymentMethod: PaymentMethod = PaymentMethod.POINT
+        protected set
     @Transient
     override var isValid: Boolean = true
 }

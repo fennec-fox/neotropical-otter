@@ -3,6 +3,7 @@ package io.mustelidae.otter.neotropical.api.config
 import io.mustelidae.otter.neotropical.api.common.Error
 import io.mustelidae.otter.neotropical.api.common.ErrorCode
 import io.mustelidae.otter.neotropical.api.common.ErrorSource
+import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.domain.payment.Payment
 
 open class CustomException(val error: ErrorSource) : RuntimeException(error.message)
@@ -91,6 +92,17 @@ class CheckoutTimeoutException(message: String) : PolicyException(
     )
 )
 class HandshakeFailException : PolicyException {
+    constructor(userId: Long, productCode: ProductCode, failMessage: String?) : super(
+        Error(
+            ErrorCode.CV01,
+            failMessage ?: "There is a problem with the vertical system. Ordering is not possible.",
+            causeBy = mapOf(
+                "userId" to userId,
+                "productCode" to productCode,
+                "fail" to failMessage
+            )
+        )
+    )
     constructor(userId: Long, payment: Payment, e: CommunicationException) : super(
         Error(
             ErrorCode.PL02,

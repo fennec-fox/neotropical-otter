@@ -3,7 +3,6 @@ package io.mustelidae.otter.neotropical.api.common.method
 import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
 import io.swagger.v3.oas.annotations.media.Schema
 
-
 @Schema(name = "Design.Method.Paid.CreditCard")
 data class PaidCreditCard(
     override val payKey: String,

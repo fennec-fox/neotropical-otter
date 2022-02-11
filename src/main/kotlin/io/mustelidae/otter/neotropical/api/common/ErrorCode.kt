@@ -25,6 +25,7 @@ enum class ErrorCode(val summary: String) {
     PP01("exceed the limit"),
     PP02("There are no items that can be canceled."),
     PP03("Vertical's Policy"),
+    PP04("Information not grouped"),
 
     S000("common system error"),
     SA00("async execute error"),
@@ -35,4 +36,5 @@ enum class ErrorCode(val summary: String) {
     C000("communication error"),
     CT01("connection timeout"),
     CT02("read timeout"),
+    CV01("vertical fail"),
 }

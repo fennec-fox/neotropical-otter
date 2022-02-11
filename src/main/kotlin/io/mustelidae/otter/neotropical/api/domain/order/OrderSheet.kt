@@ -54,6 +54,7 @@ class OrderSheet(
         private set
 
     var estimateUsingPayMethod: UsingPayMethod? = null
+        private set
 
     fun setPrivacy(
         privacy: Privacy
@@ -127,6 +128,12 @@ class OrderSheet(
         if (this.estimateUsingPayMethod != null)
             throw IllegalStateException("Payment method information has already been set.")
 
+        this.estimateUsingPayMethod = usingPayMethod
+    }
+
+    fun changeUsingPayMethod(usingPayMethod: UsingPayMethod) {
+        if (this.estimateUsingPayMethod == null)
+            throw IllegalStateException("Payment method information must be set first.")
         this.estimateUsingPayMethod = usingPayMethod
     }
 

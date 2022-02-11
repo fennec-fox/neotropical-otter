@@ -13,7 +13,8 @@ open class Voucher(
     @Transient
     override var isValid: Boolean = true
     @Transient
-    override val paymentMethod: PaymentMethod = PaymentMethod.VOUCHER
+    override var paymentMethod: PaymentMethod = PaymentMethod.VOUCHER
+        protected set
 
     @JsonIgnore
     fun fillUpDetail(userId: Long, voucherClient: VoucherClient) {

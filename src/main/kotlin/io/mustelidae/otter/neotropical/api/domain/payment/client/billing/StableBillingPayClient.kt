@@ -55,5 +55,4 @@ class StableBillingPayClient(
     override fun findByReceipt(productCode: ProductCode, userId: Long, billPayId: Long): PaidReceipt {
         TODO("Not yet implemented")
     }
-
 }

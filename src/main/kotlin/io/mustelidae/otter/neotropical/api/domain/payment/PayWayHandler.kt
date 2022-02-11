@@ -20,4 +20,18 @@ class PayWayHandler(
 
         return BillingPrePayWay(userId, amountOfPay, billingPayClient)
     }
+
+    fun getPostPayWay(userId: Long, amountOfPay: Long): PayWay {
+        if (amountOfPay == 0L)
+            return FreePayWay(userId, amountOfPay)
+        return BillingPostPayWay(userId, amountOfPay, billingPayClient)
+    }
+
+    fun getPostPayWay(payment: Payment, amountOfPay: Long? = null): PayWay {
+        val amount = amountOfPay ?: payment.priceOfOrder
+
+        if (amount == 0L)
+            return FreePayWay(payment)
+        return BillingPostPayWay(payment, billingPayClient)
+    }
 }

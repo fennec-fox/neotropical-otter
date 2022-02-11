@@ -10,7 +10,8 @@ open class CreditCard(
     open var cardNumber: String? = null
     open var corpName: String? = null
     @Transient
-    override val paymentMethod: PaymentMethod = PaymentMethod.CARD
+    override var paymentMethod: PaymentMethod = PaymentMethod.CARD
+        protected set
     @Transient
     override var isValid = true
 

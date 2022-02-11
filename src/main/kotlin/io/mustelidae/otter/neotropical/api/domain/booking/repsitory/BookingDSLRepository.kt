@@ -27,6 +27,14 @@ class BookingDSLRepository : QuerydslRepositorySupport(Booking::class.java) {
             .fetch()
     }
 
+    fun findAllByIdWithPayment(bookingIds: List<Long>): List<Booking>? {
+        return from(booking)
+            .innerJoin(booking.payment, payment).fetchJoin()
+            .where(
+                booking.id.`in`(bookingIds)
+            ).fetch()
+    }
+
     fun findAllWithStatus(userId: Long, vararg statusList: Booking.Status): List<Booking>? {
         return from(booking)
             .innerJoin(booking.payment, payment).fetchJoin()

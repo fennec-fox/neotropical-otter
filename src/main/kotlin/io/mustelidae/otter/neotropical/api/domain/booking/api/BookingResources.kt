@@ -1,8 +1,6 @@
 package io.mustelidae.otter.neotropical.api.domain.booking.api
 
-import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
-import io.mustelidae.otter.neotropical.api.domain.payment.method.DiscountCoupon
-import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
+import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
 import io.swagger.v3.oas.annotations.media.Schema
 
 class BookingResources {
@@ -14,18 +12,24 @@ class BookingResources {
             val payKey: String? = null,
             val point: Long? = null,
             val discountCoupon: Coupon? = null,
-            val voucher: Voucher? = null,
-            val adjustmentId: Long? = null
+            val voucher: Voucher? = null
         )
 
         @Schema(name = "Booking.Request.PostPayBook")
         data class PostPayBook(
             val orderId: String,
-            val usingPoint: Boolean,
-            val creditCard: CreditCard,
-            val discountCoupon: DiscountCoupon? = null,
-            val voucher: Voucher? = null,
-            val adjustmentId: Long? = null
+            val payKey: String,
+            val point: Long? = null,
+            val discountCoupon: Coupon? = null,
+            val voucher: Voucher? = null
+        )
+
+        @Schema(name = "Booking.Request.PostPayCompleteBook")
+        data class PostPayCompleteBook(
+            val changeAmount: Long? = null,
+            val changeAdjustmentId: Long? = null,
+            val cause: String? = null,
+            val changePaymentMethod: UsingPayMethod? = null
         )
 
         @Schema(name = "Booking.Request.Voucher")

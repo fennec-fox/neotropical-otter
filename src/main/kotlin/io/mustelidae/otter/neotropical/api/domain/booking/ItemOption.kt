@@ -32,14 +32,6 @@ class ItemOption(
     var item: Item? = null
         protected set
 
-    var status: Status = Status.ORDERED
-
-    enum class Status {
-        ORDERED,
-        CANCELED,
-        COMPLETED
-    }
-
     fun setBy(item: Item) {
         this.item = item
         if (item.itemOptions.contains(this).not())

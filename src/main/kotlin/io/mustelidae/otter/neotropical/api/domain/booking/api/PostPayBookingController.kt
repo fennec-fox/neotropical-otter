@@ -4,7 +4,7 @@ import io.mustelidae.otter.neotropical.api.common.Replies
 import io.mustelidae.otter.neotropical.api.common.Reply
 import io.mustelidae.otter.neotropical.api.common.toReplies
 import io.mustelidae.otter.neotropical.api.common.toReply
-import io.mustelidae.otter.neotropical.api.domain.booking.PreBookInteraction
+import io.mustelidae.otter.neotropical.api.domain.booking.PostBookInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
 import io.mustelidae.otter.neotropical.api.domain.payment.method.DiscountCoupon
@@ -26,43 +26,49 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "Pre Pay Book")
+@Tag(name = "Post Pay Book")
 @RestController
 @RequestMapping("/v1/bookings")
-class PrePayBookingController(
+class PostPayBookingController(
     private val orderSheetFinder: OrderSheetFinder,
-    private val preBookingInteraction: PreBookInteraction
+    private val postBookInteraction: PostBookInteraction
 ) {
 
-    @PostMapping("pre-pay-book")
+    @PostMapping("post-pay-book")
     @EnableUserLock
     @ResponseStatus(HttpStatus.CREATED)
     fun book(
         @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
-        @RequestBody request: BookingResources.Request.PrePayBook
+        @RequestBody request: BookingResources.Request.PostPayBook
     ): Replies<Long> {
-        val orderId = ObjectId(request.orderId)
-        val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
+        val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(request.orderId))
         DataAuthentication(RoleHeader.XUser).validOrThrow(orderSheet)
 
         val usingPayMethod = UsingPayMethod(
-            request.payKey?.let { CreditCard(it) },
+            CreditCard(request.payKey),
             request.point?.let { Point(it) },
             request.discountCoupon?.let { DiscountCoupon(it.id, it.groupId) },
             request.voucher?.let { Voucher(it.id, it.groupId) }
         )
 
-        val bookings = preBookingInteraction.book(orderSheet, usingPayMethod)
+        val bookings = postBookInteraction.book(orderSheet, usingPayMethod)
 
         return bookings.map { it.id!! }
             .toReplies()
     }
 
-    @PutMapping("{bookingIds}/complete")
+    @PutMapping("{bookingIds}/complete-n-pay")
     fun complete(
-        @PathVariable bookingIds: List<Long>
+        @PathVariable bookingIds: List<Long>,
+        @RequestBody request: BookingResources.Request.PostPayCompleteBook? = null
     ): Reply<Unit> {
-        preBookingInteraction.completed(bookingIds)
+        postBookInteraction.completed(
+            bookingIds,
+            request?.changeAmount,
+            request?.changeAdjustmentId,
+            request?.cause,
+            request?.changePaymentMethod
+        )
         return Unit.toReply()
     }
 }

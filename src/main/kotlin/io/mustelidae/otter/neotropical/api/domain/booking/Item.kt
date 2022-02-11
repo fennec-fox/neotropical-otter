@@ -67,14 +67,10 @@ class Item(
 
     fun complete() {
         this.status = Status.COMPLETED
-        this.itemOptions.filter { it.status == ItemOption.Status.ORDERED }
-            .forEach { it.status = ItemOption.Status.COMPLETED }
     }
 
     fun cancel() {
         this.status = Status.CANCELED
-        this.itemOptions.filter { it.status == ItemOption.Status.ORDERED }
-            .forEach { it.status = ItemOption.Status.CANCELED }
     }
 
     fun setBy(booking: Booking) {
