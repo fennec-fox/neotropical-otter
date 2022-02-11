@@ -64,7 +64,7 @@ class BillingPrePayWay : PayWay {
         if (payment.isPaid().not())
             throw DevelopMistakeException("Repayment is not possible.")
 
-        val paidResult = billingPayClient.repay(payment.billPayId!!, amountOfRepay, adjustmentId)
+        val paidResult = billingPayClient.repay(payment.userId, payment.billPayId!!, amountOfRepay, adjustmentId)
         payment.paid(
             paidResult.billPayId,
             paidResult.amountOfPaid,
@@ -75,22 +75,22 @@ class BillingPrePayWay : PayWay {
     }
 
     override fun cancel(cause: String) {
-        val result = billingPayClient.cancelEntire(payment.billPayId!!, cause)
+        val result = billingPayClient.cancelEntire(payment.userId, payment.billPayId!!, cause)
         payment.cancelEntire(result.transactionDate, 0)
     }
 
     override fun cancelWithPenalty(cause: String, amountOfPenalty: Long) {
-        val result = billingPayClient.cancelEntireWithPenalty(payment.billPayId!!, cause, amountOfPenalty)
+        val result = billingPayClient.cancelEntireWithPenalty(payment.userId, payment.billPayId!!, cause, amountOfPenalty)
         payment.cancelEntire(result.transactionDate, result.penaltyAmount!!)
     }
 
     override fun cancelPartial(cause: String, partialCancelAmount: Long) {
-        val result = billingPayClient.cancelPartial(payment.billPayId!!, cause, partialCancelAmount)
+        val result = billingPayClient.cancelPartial(payment.userId, payment.billPayId!!, cause, partialCancelAmount)
         payment.cancelPartial(result.transactionDate, partialCancelAmount, 0)
     }
 
     override fun cancelPartialWithPenalty(cause: String, partialCancelAmount: Long, amountOfPenalty: Long) {
-        val result = billingPayClient.cancelPartialWithPenalty(payment.billPayId!!, cause, partialCancelAmount, amountOfPenalty)
+        val result = billingPayClient.cancelPartialWithPenalty(payment.userId, payment.billPayId!!, cause, partialCancelAmount, amountOfPenalty)
         payment.cancelPartial(result.transactionDate, partialCancelAmount, amountOfPenalty)
     }
 

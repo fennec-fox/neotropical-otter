@@ -12,6 +12,7 @@ class StableBillingPayClient(
     }
 
     override fun repay(
+        userId: Long,
         billPayId: Long,
         amountOfPay: Long,
         adjustmentId: Long?
@@ -19,14 +20,12 @@ class StableBillingPayClient(
         TODO("Not yet implemented")
     }
 
-    override fun cancelEntire(
-        billPayId: Long,
-        cause: String
-    ): BillingClientResources.Reply.CancelResult {
+    override fun cancelEntire(userId: Long, billPayId: Long, cause: String): BillingClientResources.Reply.CancelResult {
         TODO("Not yet implemented")
     }
 
     override fun cancelEntireWithPenalty(
+        userId: Long,
         billPayId: Long,
         cause: String,
         penaltyAmount: Long
@@ -35,6 +34,7 @@ class StableBillingPayClient(
     }
 
     override fun cancelPartial(
+        userId: Long,
         billPayId: Long,
         cause: String,
         cancelAmount: Long
@@ -43,6 +43,7 @@ class StableBillingPayClient(
     }
 
     override fun cancelPartialWithPenalty(
+        userId: Long,
         billPayId: Long,
         cause: String,
         cancelAmount: Long,
@@ -51,7 +52,8 @@ class StableBillingPayClient(
         TODO("Not yet implemented")
     }
 
-    override fun findByReceipt(productCode: ProductCode, billPayId: Long): PaidReceipt {
+    override fun findByReceipt(productCode: ProductCode, userId: Long, billPayId: Long): PaidReceipt {
         TODO("Not yet implemented")
     }
+
 }

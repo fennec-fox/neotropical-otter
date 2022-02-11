@@ -67,10 +67,10 @@ class BookingGWController(
         @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
         @PathVariable bookingId: Long
     ): Reply<GWRecordBookingResources.Reply.RecordDetail> {
-
         val booking = bookingFinder.findOneWithItem(bookingId)
         DataAuthentication(RoleHeader.XUser).validOrThrow(booking)
 
+        // TODO use coroutine
         val verticalRecord = verticalFinder.findRecord(booking.productCode, booking.id!!)
         val paidReceipt = paymentFinder.findOneWithPaidReceipt(booking.payment!!.id!!)
 

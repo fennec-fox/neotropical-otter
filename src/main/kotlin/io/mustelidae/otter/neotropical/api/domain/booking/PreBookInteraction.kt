@@ -23,7 +23,6 @@ class PreBookInteraction(
     private val bookingFinder: BookingFinder,
     private val bookingRepository: BookingRepository,
     private val orderInteraction: OrderInteraction,
-    private val orderSheetRepository: OrderSheetRepository,
     private val verticalHandler: VerticalHandler,
     private val payWayHandler: PayWayHandler,
     private val billingPaymentMethodClient: BillingPaymentMethodClient,

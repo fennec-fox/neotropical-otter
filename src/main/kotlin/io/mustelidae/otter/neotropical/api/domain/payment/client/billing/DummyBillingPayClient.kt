@@ -46,6 +46,7 @@ class DummyBillingPayClient : BillingPayClient {
     }
 
     override fun repay(
+        userId: Long,
         billPayId: Long,
         amountOfPay: Long,
         adjustmentId: Long?
@@ -81,10 +82,7 @@ class DummyBillingPayClient : BillingPayClient {
         )
     }
 
-    override fun cancelEntire(
-        billPayId: Long,
-        cause: String
-    ): BillingClientResources.Reply.CancelResult {
+    override fun cancelEntire(userId: Long, billPayId: Long, cause: String): BillingClientResources.Reply.CancelResult {
 
         val raw = this.localStore.find { it.billPayId == billPayId }!!
         raw.isCancel = true
@@ -97,6 +95,7 @@ class DummyBillingPayClient : BillingPayClient {
     }
 
     override fun cancelEntireWithPenalty(
+        userId: Long,
         billPayId: Long,
         cause: String,
         penaltyAmount: Long
@@ -116,6 +115,7 @@ class DummyBillingPayClient : BillingPayClient {
     }
 
     override fun cancelPartial(
+        userId: Long,
         billPayId: Long,
         cause: String,
         cancelAmount: Long
@@ -133,6 +133,7 @@ class DummyBillingPayClient : BillingPayClient {
     }
 
     override fun cancelPartialWithPenalty(
+        userId: Long,
         billPayId: Long,
         cause: String,
         cancelAmount: Long,
@@ -152,7 +153,7 @@ class DummyBillingPayClient : BillingPayClient {
         )
     }
 
-    override fun findByReceipt(productCode: ProductCode, billPayId: Long): PaidReceipt {
+    override fun findByReceipt(productCode: ProductCode, userId: Long, billPayId: Long): PaidReceipt {
         val raw = this.localStore.find { it.billPayId == billPayId }!!
         val credit = raw.methods.find { it.method == PaymentMethod.CARD }?.let {
             val client = DummyBillingPaymentMethodClient()
