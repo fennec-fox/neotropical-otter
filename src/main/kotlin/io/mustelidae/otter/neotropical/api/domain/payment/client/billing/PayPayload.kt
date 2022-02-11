@@ -10,7 +10,7 @@ interface PayPayload {
     val userId: Long
     val type: PayType
     val adjustmentId: Long
-    val paymentOrderId: String
+    val bookOrderId: String
     val itemName: String
     val accountSettlementDate: LocalDate
     val amountOfPay: Long

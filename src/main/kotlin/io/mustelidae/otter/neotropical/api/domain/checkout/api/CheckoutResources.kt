@@ -10,7 +10,7 @@ class CheckoutResources {
 
     class Request {
 
-        @Schema(name = "Checkout.Request.Checkout", title = "뭘까?")
+        @Schema(name = "Checkout.Request.Checkout")
         class Checkout(
             val userId: Long,
             val products: List<ProductOrder>,
@@ -19,6 +19,7 @@ class CheckoutResources {
             val privacy: Privacy? = null,
             val settlementDate: LocalDate? = null
         ) {
+            @Schema(name = "Checkout.Request.Checkout.ProductOrder")
             data class ProductOrder(
                 val title: String,
                 val contents: List<SimpleContent>,
@@ -30,6 +31,7 @@ class CheckoutResources {
                 val preDefineField: Map<String, Any?>? = null
             ) {
 
+                @Schema(name = "Checkout.Request.Checkout.ProductOrder.GoodsOrder")
                 data class GoodsOrder(
                     val name: String,
                     val quantity: Int,
@@ -40,6 +42,7 @@ class CheckoutResources {
                     val goodsOptionOrders: List<GoodsOptionOrder>? = null
                 ) {
 
+                    @Schema(name = "Checkout.Request.Checkout.ProductOrder.GoodsOrder.GoodsOptionOrder")
                     data class GoodsOptionOrder(
                         val name: String,
                         var description: String? = null,

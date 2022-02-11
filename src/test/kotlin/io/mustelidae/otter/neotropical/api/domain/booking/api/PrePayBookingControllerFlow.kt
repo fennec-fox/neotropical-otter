@@ -1,10 +1,10 @@
 package io.mustelidae.otter.neotropical.api.domain.booking.api
 
+import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.Replies
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.mustelidae.otter.neotropical.utils.fromJson
 import io.mustelidae.otter.neotropical.utils.toJson
-import org.junit.jupiter.api.Test
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
@@ -15,7 +15,6 @@ internal class PrePayBookingControllerFlow(
     private val mockMvc: MockMvc
 ) {
 
-    @Test
     fun preBook(userId: Long, request: BookingResources.Request.PrePayBook): List<Long> {
         val uri = linkTo<PrePayBookingController> { book(userId, request) }.toUri()
 
@@ -33,12 +32,12 @@ internal class PrePayBookingControllerFlow(
             .getContent().toList()
     }
 
-    @Test
-    fun complete(bookingIds: List<Long>) {
+    fun complete(productCode: ProductCode, bookingIds: List<Long>,) {
         val uri = linkTo<PrePayBookingController> { complete(bookingIds) }.toUri()
 
         mockMvc.put(uri) {
             contentType = MediaType.APPLICATION_JSON
+            header(RoleHeader.XSystem.KEY, productCode.id)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { is2xxSuccessful() }

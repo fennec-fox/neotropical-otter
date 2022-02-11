@@ -98,7 +98,7 @@ class HandshakeFailException : PolicyException {
             causeBy = mapOf(
                 "PayError" to e.error.refCode,
                 "userId" to userId,
-                "paymentId" to payment.paymentId,
+                "billPayId" to payment.billPayId,
                 "e" to e.message
             )
         )
@@ -110,7 +110,7 @@ class HandshakeFailException : PolicyException {
             "The payment cancellation could not be processed properly. Please contact the customer center.",
             causeBy = mapOf(
                 "userId" to userId,
-                "paymentId" to payment.paymentId,
+                "bilPayId" to payment.billPayId,
                 "payKey" to payment.payKey,
                 "payType" to payment.payType,
                 "e" to message

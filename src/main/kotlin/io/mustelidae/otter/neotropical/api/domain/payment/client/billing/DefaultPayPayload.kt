@@ -10,7 +10,7 @@ class DefaultPayPayload(
     override val userId: Long,
     override val type: PayType,
     override val adjustmentId: Long,
-    override val paymentOrderId: String,
+    override val bookOrderId: String,
     override val itemName: String,
     override val accountSettlementDate: LocalDate,
     override val amountOfPay: Long,

@@ -15,37 +15,43 @@ class DummyBillingPayClient : BillingPayClient {
 
     override fun pay(userId: Long, payPayload: PayPayload): BillingClientResources.Reply.PaidResult {
 
-        val methods = listOf(
+        val methods = mutableListOf(
             BillingClientResources.Reply.MethodAmountPair(
                 PaymentMethod.CARD,
                 payPayload.amountOfPay - (payPayload.usingPayMethod.point?.amount ?: 0)
-            ),
-            BillingClientResources.Reply.MethodAmountPair(
-                PaymentMethod.POINT,
-                (payPayload.usingPayMethod.point?.amount ?: 0)
             )
         )
 
+        if (payPayload.usingPayMethod.point != null) {
+            methods.add(
+                BillingClientResources.Reply.MethodAmountPair(
+                    PaymentMethod.POINT,
+                    (payPayload.usingPayMethod.point?.amount!!)
+                )
+            )
+        }
+
+        val billPayId = Random.nextLong()
         localStore.add(
             DummyLocalRaw(
-                userId, payPayload, methods, false, Random.nextLong()
+                userId, payPayload, methods, false, billPayId
             )
         )
 
         return BillingClientResources.Reply.PaidResult(
-            Random.nextLong(),
+            billPayId,
             payPayload.amountOfPay,
             methods, LocalDateTime.now()
         )
     }
 
     override fun repay(
-        paymentId: Long,
+        billPayId: Long,
         amountOfPay: Long,
         adjustmentId: Long?
     ): BillingClientResources.Reply.PaidResult {
 
-        val raw = this.localStore.find { it.paymentId == paymentId }!!
+        val raw = this.localStore.find { it.billPayId == billPayId }!!
 
         raw.apply {
             val repayPayload = this.payPayload.run {
@@ -55,7 +61,7 @@ class DummyBillingPayClient : BillingPayClient {
                     userId,
                     type,
                     this.adjustmentId,
-                    paymentOrderId,
+                    bookOrderId,
                     itemName,
                     accountSettlementDate,
                     amountOfPay,
@@ -66,43 +72,43 @@ class DummyBillingPayClient : BillingPayClient {
             this.payPayload = repayPayload
         }
 
-        raw.paymentId = Random.nextLong()
+        raw.billPayId = Random.nextLong()
 
         return BillingClientResources.Reply.PaidResult(
-            raw.paymentId!!,
+            raw.billPayId!!,
             amountOfPay,
             raw.methods, LocalDateTime.now()
         )
     }
 
     override fun cancelEntire(
-        paymentId: Long,
+        billPayId: Long,
         cause: String
     ): BillingClientResources.Reply.CancelResult {
 
-        val raw = this.localStore.find { it.paymentId == paymentId }!!
+        val raw = this.localStore.find { it.billPayId == billPayId }!!
         raw.isCancel = true
 
         return BillingClientResources.Reply.CancelResult(
-            paymentId,
+            billPayId,
             raw.methods,
             LocalDateTime.now()
         )
     }
 
     override fun cancelEntireWithPenalty(
-        paymentId: Long,
+        billPayId: Long,
         cause: String,
         penaltyAmount: Long
     ): BillingClientResources.Reply.CancelResult {
 
-        val raw = this.localStore.find { it.paymentId == paymentId }!!
+        val raw = this.localStore.find { it.billPayId == billPayId }!!
         raw.isCancel = true
         raw.refundAmount = raw.payPayload.amountOfPay - penaltyAmount
         raw.penaltyAmount = penaltyAmount
 
         return BillingClientResources.Reply.CancelResult(
-            paymentId,
+            billPayId,
             raw.methods,
             LocalDateTime.now(),
             penaltyAmount
@@ -110,44 +116,44 @@ class DummyBillingPayClient : BillingPayClient {
     }
 
     override fun cancelPartial(
-        paymentId: Long,
+        billPayId: Long,
         cause: String,
         cancelAmount: Long
     ): BillingClientResources.Reply.CancelResult {
 
-        val raw = this.localStore.find { it.paymentId == paymentId }!!
+        val raw = this.localStore.find { it.billPayId == billPayId }!!
         raw.isCancel = true
         raw.refundAmount = raw.payPayload.amountOfPay - cancelAmount
 
         return BillingClientResources.Reply.CancelResult(
-            paymentId,
+            billPayId,
             raw.methods,
             LocalDateTime.now()
         )
     }
 
     override fun cancelPartialWithPenalty(
-        paymentId: Long,
+        billPayId: Long,
         cause: String,
         cancelAmount: Long,
         penaltyAmount: Long
     ): BillingClientResources.Reply.CancelResult {
 
-        val raw = this.localStore.find { it.paymentId == paymentId }!!
+        val raw = this.localStore.find { it.billPayId == billPayId }!!
         raw.isCancel = true
         raw.refundAmount = raw.payPayload.amountOfPay - (cancelAmount + penaltyAmount)
         raw.penaltyAmount = penaltyAmount
 
         return BillingClientResources.Reply.CancelResult(
-            paymentId,
+            billPayId,
             raw.methods,
             LocalDateTime.now(),
             penaltyAmount
         )
     }
 
-    override fun findByReceipt(productCode: ProductCode, paymentId: Long): PaidReceipt {
-        val raw = this.localStore.find { it.paymentId == paymentId }!!
+    override fun findByReceipt(productCode: ProductCode, billPayId: Long): PaidReceipt {
+        val raw = this.localStore.find { it.billPayId == billPayId }!!
         val credit = raw.methods.find { it.method == PaymentMethod.CARD }?.let {
             val client = DummyBillingPaymentMethodClient()
             val card = client.findCard(raw.userId, raw.payPayload.usingPayMethod.creditCard!!.payKey)
@@ -188,7 +194,7 @@ class DummyBillingPayClient : BillingPayClient {
         var payPayload: PayPayload,
         var methods: List<BillingClientResources.Reply.MethodAmountPair>,
         var isCancel: Boolean = false,
-        var paymentId: Long? = null,
+        var billPayId: Long? = null,
         var refundAmount: Long? = null,
         var penaltyAmount: Long? = null
     )

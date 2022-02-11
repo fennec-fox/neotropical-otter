@@ -14,12 +14,11 @@ class PaymentFinder(
     private val billingPayClient: BillingPayClient
 ) {
 
-    fun findOneWithPaidReceipt(id: Long): Pair<Payment, PaidReceipt?> {
+    fun findOneWithPaidReceipt(id: Long): PaidReceipt? {
         val payment = paymentRepository.findByIdOrNull(id) ?: throw DataNotFindException(id, "payment not found")
-        return if (payment.paymentId != null) {
-            val paidReceipt = billingPayClient.findByReceipt(payment.bookings.first().productCode, payment.paymentId!!)
-            Pair(payment, paidReceipt)
+        return if (payment.billPayId != null) {
+            billingPayClient.findByReceipt(payment.bookings.first().productCode, payment.billPayId!!)
         } else
-            Pair(payment, null)
+            null
     }
 }

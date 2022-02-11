@@ -8,6 +8,10 @@ class StableVoucherClient : VoucherClient {
         TODO("Not yet implemented")
     }
 
+    override fun findById(userId: Long, voucherId: Long): VoucherClientResources.Reply.Detail {
+        TODO("Not yet implemented")
+    }
+
     override fun use(userId: Long, productCode: ProductCode, topicId: String, voucher: Voucher) {
         TODO("Not yet implemented")
     }

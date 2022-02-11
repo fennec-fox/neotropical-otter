@@ -8,6 +8,9 @@ import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingPage
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
+import io.mustelidae.otter.neotropical.api.domain.payment.PaymentFinder
+import io.mustelidae.otter.neotropical.api.domain.payment.voucher.VoucherFinder
+import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalFinder
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import org.bson.types.ObjectId
@@ -23,7 +26,10 @@ import org.springframework.web.bind.annotation.RestController
 class BookingGWController(
     private val bookingFinder: BookingFinder,
     private val appEnvironment: AppEnvironment,
-    private val orderSheetFinder: OrderSheetFinder
+    private val orderSheetFinder: OrderSheetFinder,
+    private val verticalFinder: VerticalFinder,
+    private val paymentFinder: PaymentFinder,
+    private val voucherFinder: VoucherFinder
 ) {
 
     @GetMapping("active-bookings")
@@ -59,8 +65,17 @@ class BookingGWController(
         @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
         @PathVariable bookingId: Long
     ): Reply<GWRecordBookingResources.Reply.RecordDetail> {
-        val (booking, verticalRecord, paidReceipt) = bookingFinder.findOneWithItemAndVerticalRecord(bookingId)
+
+        val booking = bookingFinder.findOneWithItem(bookingId)
         DataAuthentication(RoleHeader.XUser).validOrThrow(booking)
+
+        val verticalRecord = verticalFinder.findRecord(booking.productCode, booking.id!!)
+        val paidReceipt = paymentFinder.findOneWithPaidReceipt(booking.payment!!.id!!)
+
+        val voucher = booking.payment!!.voucherId?.let {
+            voucherFinder.findOne(userId, it)
+        }
+
         val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(booking.orderId))
         val landingPage = LandingPage(booking, appEnvironment)
 
@@ -69,7 +84,8 @@ class BookingGWController(
             booking,
             verticalRecord,
             landingPage,
-            paidReceipt
+            paidReceipt,
+            voucher
         ).toReply()
     }
 }

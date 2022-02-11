@@ -13,10 +13,10 @@ class BillingPostPayWay : PayWay {
     private val billingPayClient: BillingPayClient
 
     override fun pay(amountOfPay: Long, orderSheet: OrderSheet, adjustmentId: Long) {
-        val paymentOrderId = orderSheet.id
+        val bookOrderId = orderSheet.id
         val usingPayMethod = orderSheet.estimateUsingPayMethod ?: throw DevelopMistakeException(ErrorCode.PD02)
 
-        payment.pay(amountOfPay, paymentOrderId, usingPayMethod.creditCard?.payKey, adjustmentId)
+        payment.pay(amountOfPay, bookOrderId, usingPayMethod.creditCard?.payKey, adjustmentId)
 
         val payload = DefaultPayPayload(
             orderSheet.productCode,
@@ -24,7 +24,7 @@ class BillingPostPayWay : PayWay {
             payment.userId,
             PayType.PAYOUT,
             adjustmentId,
-            paymentOrderId.toString(),
+            bookOrderId.toString(),
             orderSheet.products.joinToString { it.title },
             LocalDate.now(),
             amountOfPay,
@@ -35,7 +35,7 @@ class BillingPostPayWay : PayWay {
         val paidResult = billingPayClient.pay(orderSheet.userId, payload)
 
         payment.paid(
-            paidResult.paymentId,
+            paidResult.billPayId,
             paidResult.amountOfPaid,
             paidResult.paidMethods.map { it.method },
             paidResult.transactionDate

@@ -7,6 +7,8 @@ interface VoucherClient {
 
     fun findById(userId: Long, voucherId: Long, groupId: Long?): VoucherClientResources.Reply.Detail
 
+    fun findById(userId: Long, voucherId: Long): VoucherClientResources.Reply.Detail
+
     fun use(userId: Long, productCode: ProductCode, topicId: String, voucher: Voucher)
 
     fun cancel(userId: Long, voucherId: Long)

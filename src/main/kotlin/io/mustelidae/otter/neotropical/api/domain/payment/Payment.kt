@@ -21,7 +21,7 @@ import javax.persistence.Table
 @Table(
     indexes = [
         Index(name = "IDX_PAYMENT_USER", columnList = "userId,createdAt"),
-        Index(name = "IDX_PAYMENT-ID", columnList = "paymentId")
+        Index(name = "IDX_BILL-PAY-ID", columnList = "billPayId")
     ]
 )
 class Payment(
@@ -39,7 +39,7 @@ class Payment(
     var adjustmentId: Long? = null
 
     @Column(length = 40)
-    private var paymentOrderId: String? = null
+    private var bookOrderId: String? = null
 
     private var textOfMethods: String? = null
 
@@ -52,7 +52,7 @@ class Payment(
     var voucherId: Long? = null
 
     // pay
-    var paymentId: Long? = null
+    var billPayId: Long? = null
     @Column(length = 100)
     var payKey: String? = null
     var paidAmount: Long? = null
@@ -106,7 +106,7 @@ class Payment(
 
     fun pay(
         amountOfPay: Long,
-        paymentOrderId: ObjectId,
+        bookOrderId: ObjectId,
         payKey: String?,
         adjustmentId: Long? = null
     ) {
@@ -116,7 +116,7 @@ class Payment(
         this.status = Status.PAY
         this.paidDate = LocalDateTime.now()
         this.adjustmentId = adjustmentId
-        this.paymentOrderId = paymentOrderId.toString()
+        this.bookOrderId = bookOrderId.toString()
         this.payKey = payKey
 
         if (payKey.isNullOrBlank().not())
@@ -136,14 +136,14 @@ class Payment(
     }
 
     fun paid(
-        paymentId: Long,
+        billPayId: Long,
         paidAmount: Long,
         paidMethods: List<PaymentMethod>,
         pgPaidDate: LocalDateTime
     ) {
-        this.paymentId = paymentId
+        this.billPayId = billPayId
         this.paidAmount = paidAmount
-        this.textOfMethods = paidMethods.joinToString()
+        this.textOfMethods = paidMethods.joinToString(",")
         this.paidDate = pgPaidDate
     }
 
@@ -151,7 +151,7 @@ class Payment(
 
     fun isPaid(): Boolean {
         if (this.status == Status.PENDING &&
-            this.paymentId == null
+            this.billPayId == null
         )
             return false
         return true

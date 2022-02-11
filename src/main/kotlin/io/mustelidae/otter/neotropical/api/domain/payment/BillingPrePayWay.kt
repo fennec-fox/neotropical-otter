@@ -18,11 +18,11 @@ class BillingPrePayWay : PayWay {
         orderSheet: OrderSheet,
         adjustmentId: Long
     ) {
-        val paymentOrderId = orderSheet.id
+        val bookOrderId = orderSheet.id
         val accountSettlementDate = this.calculateLastSettlementDate(orderSheet)
         val usingPayMethod = orderSheet.estimateUsingPayMethod ?: throw DevelopMistakeException(ErrorCode.PD02)
 
-        payment.pay(amountOfPay, paymentOrderId, usingPayMethod.creditCard?.payKey, adjustmentId)
+        payment.pay(amountOfPay, bookOrderId, usingPayMethod.creditCard?.payKey, adjustmentId)
 
         val payload = DefaultPayPayload(
             orderSheet.productCode,
@@ -30,7 +30,7 @@ class BillingPrePayWay : PayWay {
             payment.userId,
             PayType.PAYOUT,
             adjustmentId,
-            paymentOrderId.toString(),
+            bookOrderId.toString(),
             orderSheet.products.joinToString { it.title },
             accountSettlementDate,
             amountOfPay,
@@ -41,7 +41,7 @@ class BillingPrePayWay : PayWay {
         val paidResult = billingPayClient.pay(orderSheet.userId, payload)
 
         payment.paid(
-            paidResult.paymentId,
+            paidResult.billPayId,
             paidResult.amountOfPaid,
             paidResult.paidMethods.map { it.method },
             paidResult.transactionDate
@@ -64,9 +64,9 @@ class BillingPrePayWay : PayWay {
         if (payment.isPaid().not())
             throw DevelopMistakeException("Repayment is not possible.")
 
-        val paidResult = billingPayClient.repay(payment.paymentId!!, amountOfRepay, adjustmentId)
+        val paidResult = billingPayClient.repay(payment.billPayId!!, amountOfRepay, adjustmentId)
         payment.paid(
-            paidResult.paymentId,
+            paidResult.billPayId,
             paidResult.amountOfPaid,
             paidResult.paidMethods.map { it.method },
             paidResult.transactionDate
@@ -75,22 +75,22 @@ class BillingPrePayWay : PayWay {
     }
 
     override fun cancel(cause: String) {
-        val result = billingPayClient.cancelEntire(payment.paymentId!!, cause)
+        val result = billingPayClient.cancelEntire(payment.billPayId!!, cause)
         payment.cancelEntire(result.transactionDate, 0)
     }
 
     override fun cancelWithPenalty(cause: String, amountOfPenalty: Long) {
-        val result = billingPayClient.cancelEntireWithPenalty(payment.paymentId!!, cause, amountOfPenalty)
+        val result = billingPayClient.cancelEntireWithPenalty(payment.billPayId!!, cause, amountOfPenalty)
         payment.cancelEntire(result.transactionDate, result.penaltyAmount!!)
     }
 
     override fun cancelPartial(cause: String, partialCancelAmount: Long) {
-        val result = billingPayClient.cancelPartial(payment.paymentId!!, cause, partialCancelAmount)
+        val result = billingPayClient.cancelPartial(payment.billPayId!!, cause, partialCancelAmount)
         payment.cancelPartial(result.transactionDate, partialCancelAmount, 0)
     }
 
     override fun cancelPartialWithPenalty(cause: String, partialCancelAmount: Long, amountOfPenalty: Long) {
-        val result = billingPayClient.cancelPartialWithPenalty(payment.paymentId!!, cause, partialCancelAmount, amountOfPenalty)
+        val result = billingPayClient.cancelPartialWithPenalty(payment.billPayId!!, cause, partialCancelAmount, amountOfPenalty)
         payment.cancelPartial(result.transactionDate, partialCancelAmount, amountOfPenalty)
     }
 

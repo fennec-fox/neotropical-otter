@@ -45,7 +45,7 @@ class GWRecordBookingResources {
                 val status: Label,
                 val amountOfPay: Long? = null,
                 val amountOfRefund: Long? = null,
-                val paymentId: Long? = null,
+                val billPayId: Long? = null,
                 val voucherId: Long? = null
             ) {
                 companion object {
@@ -56,7 +56,7 @@ class GWRecordBookingResources {
                                 Label(status.name),
                                 paidAmount,
                                 refundAmount,
-                                paymentId,
+                                billPayId,
                                 voucherId
                             )
                         }
@@ -137,8 +137,7 @@ class GWRecordBookingResources {
                 val canceledDate: LocalDateTime? = null,
             ) {
                 companion object {
-                    fun from(orderSheet: OrderSheet, payment: Payment, paidReceipt: PaidReceipt?): PaymentReceipt {
-                        val voucher = orderSheet.estimateUsingPayMethod?.voucher
+                    fun from(payment: Payment, paidReceipt: PaidReceipt?, voucher: Voucher?): PaymentReceipt {
 
                         @Suppress("IfThenToElvis")
                         return if (paidReceipt != null) {
@@ -178,7 +177,8 @@ class GWRecordBookingResources {
                     booking: Booking,
                     verticalRecord: VerticalRecord,
                     landingPage: LandingPage,
-                    paidReceipt: PaidReceipt?
+                    paidReceipt: PaidReceipt?,
+                    voucher: Voucher?
                 ): RecordDetail {
                     return booking.run {
 
@@ -202,7 +202,7 @@ class GWRecordBookingResources {
                             !isHide,
                             landingPage.getRecordDetail(),
                             getContent() ?: emptyList(),
-                            PaymentReceipt.from(orderSheet, booking.payment!!, paidReceipt),
+                            PaymentReceipt.from(booking.payment!!, paidReceipt, voucher),
                             Detail.from(orderSheet, verticalRecord),
                             verticalRecord.preDefineField
                         )

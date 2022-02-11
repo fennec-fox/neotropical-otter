@@ -11,14 +11,14 @@ class BillingClientResources {
 
     class Reply {
         data class PaidResult(
-            val paymentId: Long,
+            val billPayId: Long,
             val amountOfPaid: Long,
             val paidMethods: List<MethodAmountPair>,
             val transactionDate: LocalDateTime,
         )
 
         data class CancelResult(
-            val paymentId: Long,
+            val billPayId: Long,
             val refundMethods: List<MethodAmountPair>,
             val transactionDate: LocalDateTime,
             val penaltyAmount: Long? = null

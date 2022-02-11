@@ -5,7 +5,6 @@ import io.mustelidae.otter.neotropical.api.config.HandshakeFailException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
 import io.mustelidae.otter.neotropical.api.domain.order.OrderInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
-import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.order.repository.OrderSheetRepository
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWay
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
@@ -24,7 +23,6 @@ class PreBookInteraction(
     private val bookingFinder: BookingFinder,
     private val bookingRepository: BookingRepository,
     private val orderInteraction: OrderInteraction,
-    private val orderSheetFinder: OrderSheetFinder,
     private val orderSheetRepository: OrderSheetRepository,
     private val verticalHandler: VerticalHandler,
     private val payWayHandler: PayWayHandler,
