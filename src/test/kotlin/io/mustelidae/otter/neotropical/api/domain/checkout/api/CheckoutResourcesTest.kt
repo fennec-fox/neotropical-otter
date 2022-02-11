@@ -1,7 +1,7 @@
 package io.mustelidae.otter.neotropical.api.domain.checkout.api
 
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
-import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.Label
+import io.mustelidae.otter.neotropical.api.common.design.v1.component.Label
 import java.time.LocalDateTime
 import kotlin.random.Random
 

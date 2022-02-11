@@ -5,17 +5,20 @@ import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class OrderResources {
 
     class Modify {
+        @Schema(name = "Modify.Order")
         data class Order(
             val status: OrderSheet.Status,
         )
     }
 
     class Reply {
+        @Schema(name = "Order.Reply.PurchaseOrder")
         data class PurchaseOrder(
             val id: String,
             val createdAt: LocalDateTime,
@@ -31,6 +34,7 @@ class OrderResources {
             val policyCards: List<PolicyCard>? = null
         ) {
 
+            @Schema(name = "Order.Reply.PurchaseOrder.OrderedProduct")
             data class OrderedProduct(
                 val title: String,
                 val contents: List<SimpleContent>,
@@ -42,6 +46,7 @@ class OrderResources {
                 val preDefineField: Map<String, Any?>? = null
             ) {
 
+                @Schema(name = "Order.Reply.PurchaseOrder.OrderedProduct.OrderedGoods")
                 data class OrderedGoods(
                     val name: String,
                     val quantity: Int,

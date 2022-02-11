@@ -1,8 +1,8 @@
 package io.mustelidae.otter.neotropical.api.domain.payment
 
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidCreditCard
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidDiscountCoupon
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidPoint
+import io.mustelidae.otter.neotropical.api.common.method.PaidCreditCard
+import io.mustelidae.otter.neotropical.api.common.method.PaidDiscountCoupon
+import io.mustelidae.otter.neotropical.api.common.method.PaidPoint
 import java.time.LocalDateTime
 
 data class PaidReceipt(

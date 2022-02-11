@@ -1,8 +1,10 @@
 package io.mustelidae.otter.neotropical.api.common
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
+import io.swagger.v3.oas.annotations.media.Schema
 import javax.xml.bind.annotation.XmlAnyElement
 
+@Schema(name = "Common.Reply")
 open class Reply<T>() {
     @get:JsonUnwrapped
     @get:XmlAnyElement

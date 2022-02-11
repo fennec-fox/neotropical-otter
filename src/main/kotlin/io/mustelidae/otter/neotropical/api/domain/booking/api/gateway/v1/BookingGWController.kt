@@ -13,6 +13,7 @@ import io.mustelidae.otter.neotropical.api.domain.payment.voucher.VoucherFinder
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalFinder
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.bson.types.ObjectId
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+@Tag(name = "Gateway")
 @RestController
 @RequestMapping("/v1/gateway")
 class BookingGWController(

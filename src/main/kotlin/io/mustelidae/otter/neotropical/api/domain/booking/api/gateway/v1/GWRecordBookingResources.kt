@@ -7,24 +7,26 @@ import io.mustelidae.otter.neotropical.api.common.design.v1.component.ImageCard
 import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.ApiModelType
-import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.Label
+import io.mustelidae.otter.neotropical.api.common.design.v1.component.Label
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingPage
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingWay
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.payment.PaidReceipt
 import io.mustelidae.otter.neotropical.api.domain.payment.Payment
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidCreditCard
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidDiscountCoupon
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidPoint
+import io.mustelidae.otter.neotropical.api.common.method.PaidCreditCard
+import io.mustelidae.otter.neotropical.api.common.method.PaidDiscountCoupon
+import io.mustelidae.otter.neotropical.api.common.method.PaidPoint
 import io.mustelidae.otter.neotropical.api.domain.payment.method.PaymentMethod
 import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.VerticalRecord
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class GWRecordBookingResources {
 
     class Reply {
 
+        @Schema(name = "Gateway.Reply.Record")
         data class Record(
             val id: Long,
             val createAt: LocalDateTime,
@@ -40,6 +42,7 @@ class GWRecordBookingResources {
             val contents: List<SimpleContent> = emptyList(),
             val receipt: SimpleReceipt
         ) {
+            @Schema(name = "Gateway.Reply.Record.SimpleReceipt")
             data class SimpleReceipt(
                 val payMethods: List<PaymentMethod>,
                 val status: Label,
@@ -87,6 +90,7 @@ class GWRecordBookingResources {
             }
         }
 
+        @Schema(name = "Gateway.Reply.RecordDetail")
         data class RecordDetail(
             val id: Long,
             val createAt: LocalDateTime,
@@ -101,9 +105,10 @@ class GWRecordBookingResources {
             val landingPath: String? = null,
             val contents: List<SimpleContent> = emptyList(),
             val receipt: PaymentReceipt,
-            val detail: Detail,
+            val verticalDetail: Detail,
             val productDefineField: Map<String, Any?>? = null
         ) {
+            @Schema(name = "Gateway.Reply.RecordDetail.VerticalDetail")
             data class Detail(
                 val displayCards: List<DisplayCard>? = null,
                 val imageCards: List<ImageCard>? = null,
@@ -125,6 +130,7 @@ class GWRecordBookingResources {
                 }
             }
 
+            @Schema(name = "Gateway.Reply.RecordDetail.PaymentReceipt")
             data class PaymentReceipt(
                 val totalPaidAmount: Long,
                 val paidDate: LocalDateTime? = null,

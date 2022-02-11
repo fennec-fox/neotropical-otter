@@ -2,12 +2,14 @@ package io.mustelidae.otter.neotropical.api.common
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonRootName
+import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.util.Assert
 import java.util.ArrayList
 import java.util.Collections
 import javax.xml.bind.annotation.XmlAnyElement
 import javax.xml.bind.annotation.XmlElementWrapper
 
+@Schema(name = "Common.Replies")
 @JsonRootName(value = "entities")
 open class Replies<T>
 constructor(content: Iterable<T>) : Iterable<T> {

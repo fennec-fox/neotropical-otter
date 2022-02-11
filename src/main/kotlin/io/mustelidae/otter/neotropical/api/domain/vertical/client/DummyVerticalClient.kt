@@ -6,7 +6,7 @@ import io.mustelidae.otter.neotropical.api.common.design.v1.component.PolicyCard
 import io.mustelidae.otter.neotropical.api.config.AppEnvironment
 import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
-import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.Label
+import io.mustelidae.otter.neotropical.api.common.design.v1.component.Label
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.vertical.CallOffBooking
 import io.mustelidae.otter.neotropical.api.domain.vertical.CancellationUnit

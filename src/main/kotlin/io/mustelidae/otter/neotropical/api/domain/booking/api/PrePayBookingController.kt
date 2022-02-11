@@ -15,6 +15,7 @@ import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.lock.EnableUserLock
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.bson.types.ObjectId
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+@Tag(name = "Pre Pay Book")
 @RestController
 @RequestMapping("/v1/bookings")
 class PrePayBookingController(

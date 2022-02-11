@@ -2,9 +2,9 @@ package io.mustelidae.otter.neotropical.api.domain.payment.client.billing
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.domain.payment.PaidReceipt
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidCreditCard
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidDiscountCoupon
-import io.mustelidae.otter.neotropical.api.domain.payment.method.PaidPoint
+import io.mustelidae.otter.neotropical.api.common.method.PaidCreditCard
+import io.mustelidae.otter.neotropical.api.common.method.PaidDiscountCoupon
+import io.mustelidae.otter.neotropical.api.common.method.PaidPoint
 import io.mustelidae.otter.neotropical.api.domain.payment.method.PaymentMethod
 import java.time.LocalDateTime
 import kotlin.random.Random

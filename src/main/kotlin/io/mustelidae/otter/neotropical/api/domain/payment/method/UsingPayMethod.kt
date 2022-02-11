@@ -1,6 +1,10 @@
 package io.mustelidae.otter.neotropical.api.domain.payment.method
 
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPaymentMethodClient
+import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
+import io.mustelidae.otter.neotropical.api.domain.payment.method.DiscountCoupon
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Point
+import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
 
 data class UsingPayMethod(
