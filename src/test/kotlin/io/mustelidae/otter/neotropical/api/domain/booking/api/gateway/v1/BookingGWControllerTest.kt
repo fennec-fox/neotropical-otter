@@ -19,7 +19,7 @@ internal class BookingGWControllerTest : FlowTestSupport() {
     @Test
     fun activeBookingsOfPreBooking() {
         // Given
-        val userId = 374238472432L
+        val userId = 327482432L
         val productCode = ProductCode.MOCK_UP
         val topicId = Topic.topicMap[productCode]!!.first()
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
