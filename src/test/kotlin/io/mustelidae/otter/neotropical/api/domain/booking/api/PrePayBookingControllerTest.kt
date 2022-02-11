@@ -166,7 +166,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
-        val bookingRequest = BookingResources.Request.aFixturePrePayOfCreditDiscount(orderId)
+        val bookingRequest = BookingResources.Request.aFixturePrePayOfCreditWithDiscount(orderId)
         val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
         val targetBookingId = bookingIds.first()
 

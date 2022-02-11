@@ -87,7 +87,7 @@ class PostBookInteraction(
             it.completed()
         }
 
-        val payWay = payWayHandler.getPostPayWay(payment, changeAmount)
+        val payWay = payWayHandler.getPostPayWay(payment, changeAmount, usingPayMethod.voucher)
         payWay.pay(amountOfPay, orderSheet, adjustmentId)
 
         bookingRepository.saveAll(bookings)

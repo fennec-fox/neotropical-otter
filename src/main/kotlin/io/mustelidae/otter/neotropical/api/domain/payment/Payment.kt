@@ -50,6 +50,7 @@ class Payment(
 
     // voucher
     var voucherId: Long? = null
+        protected set
 
     // pay
     var billPayId: Long? = null

@@ -27,7 +27,10 @@ class PayWayHandler(
         return BillingPostPayWay(userId, amountOfPay, billingPayClient)
     }
 
-    fun getPostPayWay(payment: Payment, amountOfPay: Long? = null): PayWay {
+    fun getPostPayWay(payment: Payment, amountOfPay: Long? = null, voucher: Voucher?): PayWay {
+        if (voucher != null)
+            return VoucherPayWay(payment, voucherClient)
+
         val amount = amountOfPay ?: payment.priceOfOrder
 
         if (amount == 0L)

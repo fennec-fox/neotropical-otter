@@ -4,9 +4,7 @@ import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPaymentMethodClient
 import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
 import io.mustelidae.otter.neotropical.api.domain.payment.method.DiscountCoupon
-import io.mustelidae.otter.neotropical.api.domain.payment.method.Point
 import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
-import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
 import org.springframework.stereotype.Service
 
@@ -19,32 +17,47 @@ class PaymentMethodCalibration(
     fun calibrate(userId: Long, orderSheet: OrderSheet, changePaymentMethod: UsingPayMethod?): UsingPayMethod {
         val orderedPayMethod = orderSheet.estimateUsingPayMethod!!
 
-        var creditCard: CreditCard? = null
-        var point: Point? = null
-        var discountCoupon: DiscountCoupon? = null
-        var voucher: Voucher? = null
+        var sourceCreditCard = orderedPayMethod.creditCard
+        var sourcePoint = orderedPayMethod.point
+        var sourceDiscountCoupon = orderedPayMethod.discountCoupon
+        var sourceVoucher = orderedPayMethod.voucher
 
-        if (changePaymentMethod != null) {
-            changePaymentMethod.fillUpDetailAll(userId, billingPaymentMethodClient, voucherClient)
+        changePaymentMethod?.let {
+            it.fillUpDetailAll(userId, billingPaymentMethodClient, voucherClient)
 
-            if (changePaymentMethod.creditCard != null && changePaymentMethod.creditCard.isValid)
-                creditCard = changePaymentMethod.creditCard
+            if (it.creditCard != null && it.creditCard.isValid)
+                sourceCreditCard = it.creditCard
 
-            if (changePaymentMethod.discountCoupon != null && changePaymentMethod.discountCoupon.isValid)
-                discountCoupon = changePaymentMethod.discountCoupon
+            if (it.discountCoupon != null && it.discountCoupon.isValid)
+                sourceDiscountCoupon = it.discountCoupon
 
-            if (changePaymentMethod.point != null && changePaymentMethod.point.isValid)
-                point = changePaymentMethod.point
+            if (it.point != null && it.point.isValid)
+                sourcePoint = it.point
 
-            if (changePaymentMethod.voucher != null && changePaymentMethod.voucher.isValid)
-                voucher = changePaymentMethod.voucher
+            if (it.voucher != null && it.voucher.isValid)
+                sourceVoucher = it.voucher
+        }
+
+        // If you have a voucher, use it only.
+        if (sourceVoucher != null) {
+            sourceVoucher!!.fillUpDetail(userId, voucherClient)
+            if (sourceVoucher!!.isValid)
+                return UsingPayMethod(null, null, null, sourceVoucher)
+        }
+
+        var normalcyDiscountCoupon: DiscountCoupon? = null
+
+        if (sourceDiscountCoupon != null) {
+            sourceDiscountCoupon!!.fillUpDetail(userId, billingPaymentMethodClient)
+            if (sourceDiscountCoupon!!.isValid)
+                normalcyDiscountCoupon = sourceDiscountCoupon
         }
 
         return UsingPayMethod(
-            creditCard ?: getValidCard(orderedPayMethod.creditCard!!, userId),
-            point ?: orderedPayMethod.point,
-            discountCoupon ?: orderedPayMethod.discountCoupon,
-            voucher ?: orderedPayMethod.voucher
+            getValidCard(sourceCreditCard!!, userId),
+            sourcePoint,
+            normalcyDiscountCoupon,
+            null
         )
     }
 
