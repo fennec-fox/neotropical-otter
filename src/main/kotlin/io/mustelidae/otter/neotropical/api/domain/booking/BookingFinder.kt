@@ -18,8 +18,16 @@ class BookingFinder
     private val billingPayClient: BillingPayClient
 ) {
 
-    fun findIn(bookingIds: List<Long>): List<Booking> {
+    fun findInWithPayment(bookingIds: List<Long>): List<Booking> {
         val bookings = bookingDSLRepository.findAllByIdWithPayment(bookingIds) ?: emptyList()
+        if (bookings.size != bookingIds.size)
+            throw DataNotFindException("Couldn't find all the booking for the requested ID.")
+
+        return bookings
+    }
+
+    fun findAllByIds(bookingIds: List<Long>): List<Booking> {
+        val bookings = bookingRepository.findAllById(bookingIds) ?: emptyList()
         if (bookings.size != bookingIds.size)
             throw DataNotFindException("Couldn't find all the booking for the requested ID.")
 

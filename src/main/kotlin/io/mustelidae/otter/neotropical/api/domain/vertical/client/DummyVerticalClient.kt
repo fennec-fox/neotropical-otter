@@ -114,7 +114,7 @@ class DummyVerticalClient(
             ExchangeResult(false, "Cancellation is not possible due to testing.")
     }
 
-    override fun askWhetherCallOff(userId: Long, bookingId: Long): CallOffBooking {
+    override fun askWhetherCallOff(userId: Long, bookingIds: List<Long>): CallOffBooking {
         return if (productEnv.dummyControl.callOff)
             CallOffBooking(true, 0, 0)
         else

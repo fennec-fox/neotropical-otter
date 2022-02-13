@@ -11,7 +11,7 @@ class PayWayHandler(
     private val billingPayClient: BillingPayClient
 ) {
 
-    fun getPrePayWay(userId: Long, amountOfPay: Long, voucher: Voucher?): PayWay {
+    fun getPayWayOfPrePayBook(userId: Long, amountOfPay: Long, voucher: Voucher?): PayWay {
         if (voucher != null)
             return VoucherPayWay(userId, amountOfPay, voucherClient)
 
@@ -21,13 +21,13 @@ class PayWayHandler(
         return BillingPrePayWay(userId, amountOfPay, billingPayClient)
     }
 
-    fun getPostPayWay(userId: Long, amountOfPay: Long): PayWay {
+    fun getPayWayOfPostPayBook(userId: Long, amountOfPay: Long): PayWay {
         if (amountOfPay == 0L)
             return FreePayWay(userId, amountOfPay)
         return BillingPostPayWay(userId, amountOfPay, billingPayClient)
     }
 
-    fun getPostPayWay(payment: Payment, amountOfPay: Long? = null, voucher: Voucher?): PayWay {
+    fun getPayWayOfPostPayBook(payment: Payment, amountOfPay: Long? = null, voucher: Voucher?): PayWay {
         if (voucher != null)
             return VoucherPayWay(payment, voucherClient)
 
@@ -36,5 +36,14 @@ class PayWayHandler(
         if (amount == 0L)
             return FreePayWay(payment)
         return BillingPostPayWay(payment, billingPayClient)
+    }
+
+    fun getPayWay(payment: Payment): PayWay {
+        return when (payment.payType) {
+            PayWay.Type.POST_PAY -> BillingPostPayWay(payment, billingPayClient)
+            PayWay.Type.PRE_PAY -> BillingPrePayWay(payment, billingPayClient)
+            PayWay.Type.FREE -> FreePayWay(payment)
+            PayWay.Type.VOUCHER -> VoucherPayWay(payment, voucherClient)
+        }
     }
 }

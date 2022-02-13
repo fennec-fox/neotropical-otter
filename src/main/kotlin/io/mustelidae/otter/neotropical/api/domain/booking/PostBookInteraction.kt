@@ -46,7 +46,7 @@ class PostBookInteraction(
         val verticalBooking = verticalHandler.getBooking(orderSheet)
         val amountOfPay = verticalBooking.amountOfPay
 
-        payWayHandler.getPostPayWay(userId, amountOfPay).apply {
+        payWayHandler.getPayWayOfPostPayBook(userId, amountOfPay).apply {
             addAllBookingToBePay(verticalBooking.bookings)
         }
 
@@ -69,7 +69,7 @@ class PostBookInteraction(
         cause: String? = null,
         changePaymentMethod: UsingPayMethod? = null
     ) {
-        val bookings = bookingFinder.findIn(bookingIds).apply {
+        val bookings = bookingFinder.findInWithPayment(bookingIds).apply {
             sameOrThrow()
         }
         DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
@@ -87,7 +87,7 @@ class PostBookInteraction(
             it.completed()
         }
 
-        val payWay = payWayHandler.getPostPayWay(payment, changeAmount, usingPayMethod.voucher)
+        val payWay = payWayHandler.getPayWayOfPostPayBook(payment, changeAmount, usingPayMethod.voucher)
         payWay.pay(amountOfPay, orderSheet, adjustmentId)
 
         bookingRepository.saveAll(bookings)

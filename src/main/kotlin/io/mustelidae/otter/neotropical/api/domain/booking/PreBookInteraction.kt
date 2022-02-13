@@ -46,7 +46,7 @@ class PreBookInteraction(
         val adjustmentId = verticalBooking.adjustmentId
         val amountOfPay = verticalBooking.amountOfPay
 
-        val payWay = payWayHandler.getPrePayWay(userId, amountOfPay, usingPayMethod.voucher).apply {
+        val payWay = payWayHandler.getPayWayOfPrePayBook(userId, amountOfPay, usingPayMethod.voucher).apply {
             addAllBookingToBePay(verticalBooking.bookings)
         }
 
@@ -64,7 +64,7 @@ class PreBookInteraction(
     }
 
     fun completed(bookingIds: List<Long>) {
-        val bookings = bookingFinder.findIn(bookingIds).apply {
+        val bookings = bookingFinder.findInWithPayment(bookingIds).apply {
             sameOrThrow()
         }
         DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
