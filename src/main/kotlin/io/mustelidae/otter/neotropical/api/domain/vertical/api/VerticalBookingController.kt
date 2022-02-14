@@ -1,9 +1,12 @@
 package io.mustelidae.otter.neotropical.api.domain.vertical.api
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
+import io.mustelidae.otter.neotropical.api.common.Replies
 import io.mustelidae.otter.neotropical.api.common.Reply
+import io.mustelidae.otter.neotropical.api.common.toReplies
 import io.mustelidae.otter.neotropical.api.common.toReply
 import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
+import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingResources
 import io.mustelidae.otter.neotropical.api.domain.cancel.BookingCancelInteraction
 import io.mustelidae.otter.neotropical.api.domain.cancel.OrderCancelInteraction
 import io.mustelidae.otter.neotropical.api.lock.EnableUserLock
@@ -14,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -64,5 +68,17 @@ class VerticalBookingController(
         DataAuthentication(RoleHeader.XSystem, RoleHeader.XUser).validOrThrow(bookings)
         bookingCancelInteraction.forceCancelWithoutVerticalShaking(bookingIds, cancelFee, cause)
         return Unit.toReply()
+    }
+
+    @Parameter(name = RoleHeader.XSystem.KEY, description = RoleHeader.XSystem.NAME)
+    @GetMapping("/recent-bookings")
+    fun recentBooking(
+        @PathVariable productCode: ProductCode,
+        @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
+        @RequestParam topicId: String? = null
+    ): Replies<BookingResources.Reply.BookingOfOrdered> {
+        val bookings = bookingFinder.findRecentUsage(userId, productCode, topicId)
+        return bookings.map { BookingResources.Reply.BookingOfOrdered.from(it) }
+            .toReplies()
     }
 }

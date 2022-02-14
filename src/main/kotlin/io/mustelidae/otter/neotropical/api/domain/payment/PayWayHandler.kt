@@ -13,7 +13,7 @@ class PayWayHandler(
 
     fun getPayWayOfPrePayBook(userId: Long, amountOfPay: Long, voucher: Voucher?): PayWay {
         if (voucher != null)
-            return VoucherPayWay(userId, amountOfPay, voucherClient)
+            return VoucherPayWay(userId, amountOfPay, voucherClient, voucher)
 
         if (amountOfPay == 0L)
             return FreePayWay(userId, amountOfPay)
@@ -21,7 +21,10 @@ class PayWayHandler(
         return BillingPrePayWay(userId, amountOfPay, billingPayClient)
     }
 
-    fun getPayWayOfPostPayBook(userId: Long, amountOfPay: Long): PayWay {
+    fun getPayWayOfPostPayBook(userId: Long, amountOfPay: Long, voucher: Voucher?): PayWay {
+        if (voucher != null)
+            return VoucherPayWay(userId, amountOfPay, voucherClient, voucher)
+
         if (amountOfPay == 0L)
             return FreePayWay(userId, amountOfPay)
         return BillingPostPayWay(userId, amountOfPay, billingPayClient)
@@ -29,7 +32,7 @@ class PayWayHandler(
 
     fun getPayWayOfPostPayBook(payment: Payment, amountOfPay: Long? = null, voucher: Voucher?): PayWay {
         if (voucher != null)
-            return VoucherPayWay(payment, voucherClient)
+            return VoucherPayWay(payment, voucherClient, voucher)
 
         val amount = amountOfPay ?: payment.priceOfOrder
 

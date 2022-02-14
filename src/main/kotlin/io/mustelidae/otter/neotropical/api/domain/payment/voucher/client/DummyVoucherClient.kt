@@ -26,6 +26,10 @@ class DummyVoucherClient : VoucherClient {
         )
     }
 
+    override fun reserveUse(userId: Long, voucher: Voucher) {}
+
+    override fun rollbackReserve(userId: Long, voucher: Voucher) {}
+
     override fun use(userId: Long, productCode: ProductCode, topicId: String, voucher: Voucher) {}
 
     override fun cancel(userId: Long, voucherId: Long) {}

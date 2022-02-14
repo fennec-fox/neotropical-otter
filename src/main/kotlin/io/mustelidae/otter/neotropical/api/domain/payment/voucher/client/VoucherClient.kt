@@ -9,6 +9,10 @@ interface VoucherClient {
 
     fun findById(userId: Long, voucherId: Long): VoucherClientResources.Reply.Detail
 
+    fun reserveUse(userId: Long, voucher: Voucher)
+
+    fun rollbackReserve(userId: Long, voucher: Voucher)
+
     fun use(userId: Long, productCode: ProductCode, topicId: String, voucher: Voucher)
 
     fun cancel(userId: Long, voucherId: Long)

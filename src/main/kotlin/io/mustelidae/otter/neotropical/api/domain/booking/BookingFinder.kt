@@ -1,6 +1,7 @@
 package io.mustelidae.otter.neotropical.api.domain.booking
 
 import io.mustelidae.otter.neotropical.api.common.ProductCode
+import io.mustelidae.otter.neotropical.api.common.SearchCondition
 import io.mustelidae.otter.neotropical.api.config.DataNotFindException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingDSLRepository
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository

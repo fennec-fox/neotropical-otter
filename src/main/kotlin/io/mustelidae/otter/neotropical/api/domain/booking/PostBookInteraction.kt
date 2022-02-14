@@ -9,6 +9,7 @@ import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.order.repository.OrderSheetRepository
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
 import io.mustelidae.otter.neotropical.api.domain.payment.PaymentMethodCalibration
+import io.mustelidae.otter.neotropical.api.domain.payment.VoucherPayWay
 import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
@@ -46,15 +47,22 @@ class PostBookInteraction(
         val verticalBooking = verticalHandler.getBooking(orderSheet)
         val amountOfPay = verticalBooking.amountOfPay
 
-        payWayHandler.getPayWayOfPostPayBook(userId, amountOfPay).apply {
+        val payWay = payWayHandler.getPayWayOfPostPayBook(userId, amountOfPay, usingPayMethod.voucher).apply {
             addAllBookingToBePay(verticalBooking.bookings)
         }
+
+        if (payWay is VoucherPayWay)
+            payWay.reserveUse()
 
         bookingRepository.saveAll(verticalBooking.bookings)
         val exchangeResult = verticalBooking.book(orderInteraction)
 
-        if (exchangeResult.isSuccess.not())
+        if (exchangeResult.isSuccess.not()) {
+            if (payWay is VoucherPayWay)
+                payWay.rollbackReserve()
+
             throw HandshakeFailException(userId, orderSheet.productCode, exchangeResult.failCause)
+        }
 
         bookingRepository.saveAll(verticalBooking.bookings)
         orderSheetRepository.save(orderSheet)

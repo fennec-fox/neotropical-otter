@@ -1,4 +1,4 @@
-package io.mustelidae.otter.neotropical.api.domain.booking
+package io.mustelidae.otter.neotropical.api.common
 
 import org.springframework.data.jpa.domain.Specification
 import java.time.LocalDate

@@ -10,6 +10,7 @@ import io.mustelidae.otter.neotropical.api.common.method.PaidCreditCard
 import io.mustelidae.otter.neotropical.api.common.method.PaidDiscountCoupon
 import io.mustelidae.otter.neotropical.api.common.method.PaidPoint
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
+import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingResources
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.ApiModelType
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingPage
 import io.mustelidae.otter.neotropical.api.domain.booking.api.gateway.LandingWay
@@ -100,6 +101,7 @@ class GWRecordBookingResources {
             val title: String,
             val type: ApiModelType,
             val status: Label,
+            val items: List<BookingResources.Reply.BookingOfOrderedWithItems.ItemOfOrdered>,
             val landingType: LandingWay,
             val isActive: Boolean = true,
             val landingPath: String? = null,
@@ -108,6 +110,47 @@ class GWRecordBookingResources {
             val verticalDetail: Detail,
             val productDefineField: Map<String, Any?>? = null
         ) {
+
+            companion object {
+                fun from(
+                    orderSheet: OrderSheet,
+                    booking: Booking,
+                    verticalRecord: VerticalRecord,
+                    landingPage: LandingPage,
+                    paidReceipt: PaidReceipt?,
+                    voucher: Voucher?
+                ): RecordDetail {
+                    return booking.run {
+                        val items = booking.items.map { BookingResources.Reply.BookingOfOrderedWithItems.ItemOfOrdered.from(it) }
+                        val color = when (booking.status) {
+                            Booking.Status.WAIT -> Label.Color.YELLOW
+                            Booking.Status.BOOKED -> Label.Color.BLUE
+                            Booking.Status.COMPLETED -> Label.Color.GRAY
+                            Booking.Status.CANCELED -> Label.Color.RED
+                        }
+
+                        RecordDetail(
+                            id!!,
+                            createdAt!!,
+                            productCode,
+                            topicId,
+                            modifiedAt!!,
+                            title,
+                            ApiModelType.BOOKING,
+                            Label(status.text, false, color),
+                            items,
+                            landingPage.getLandingWay(),
+                            !isHide,
+                            landingPage.getRecordDetail(),
+                            getContent() ?: emptyList(),
+                            PaymentReceipt.from(booking.payment!!, paidReceipt, voucher),
+                            Detail.from(orderSheet, verticalRecord),
+                            verticalRecord.preDefineField
+                        )
+                    }
+                }
+            }
+
             @Schema(name = "Gateway.Reply.RecordDetail.VerticalDetail")
             data class Detail(
                 val displayCards: List<DisplayCard>? = null,
@@ -173,45 +216,6 @@ class GWRecordBookingResources {
                                 )
                             }
                         }
-                    }
-                }
-            }
-
-            companion object {
-                fun from(
-                    orderSheet: OrderSheet,
-                    booking: Booking,
-                    verticalRecord: VerticalRecord,
-                    landingPage: LandingPage,
-                    paidReceipt: PaidReceipt?,
-                    voucher: Voucher?
-                ): RecordDetail {
-                    return booking.run {
-
-                        val color = when (booking.status) {
-                            Booking.Status.WAIT -> Label.Color.YELLOW
-                            Booking.Status.BOOKED -> Label.Color.BLUE
-                            Booking.Status.COMPLETED -> Label.Color.GRAY
-                            Booking.Status.CANCELED -> Label.Color.RED
-                        }
-
-                        RecordDetail(
-                            id!!,
-                            createdAt!!,
-                            productCode,
-                            topicId,
-                            modifiedAt!!,
-                            title,
-                            ApiModelType.BOOKING,
-                            Label(status.text, false, color),
-                            landingPage.getLandingWay(),
-                            !isHide,
-                            landingPage.getRecordDetail(),
-                            getContent() ?: emptyList(),
-                            PaymentReceipt.from(booking.payment!!, paidReceipt, voucher),
-                            Detail.from(orderSheet, verticalRecord),
-                            verticalRecord.preDefineField
-                        )
                     }
                 }
             }

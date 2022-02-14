@@ -1,5 +1,8 @@
 package io.mustelidae.otter.neotropical.api.domain.booking
 
+import org.hibernate.annotations.BatchSize
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -37,10 +40,6 @@ class Item(
 
     var canceledDate: LocalDateTime? = null
         protected set
-    var refundPrice: Long? = null
-        protected set
-    var cancelFee: Long? = null
-        protected set
 
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
@@ -61,6 +60,8 @@ class Item(
     var booking: Booking? = null
         protected set
 
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 10)
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "item", fetch = FetchType.EAGER)
     var itemOptions: MutableList<ItemOption> = arrayListOf()
         protected set

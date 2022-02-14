@@ -12,6 +12,14 @@ class StableVoucherClient : VoucherClient {
         TODO("Not yet implemented")
     }
 
+    override fun reserveUse(userId: Long, voucher: Voucher) {
+        TODO("Not yet implemented")
+    }
+
+    override fun rollbackReserve(userId: Long, voucher: Voucher) {
+        TODO("Not yet implemented")
+    }
+
     override fun use(userId: Long, productCode: ProductCode, topicId: String, voucher: Voucher) {
         TODO("Not yet implemented")
     }

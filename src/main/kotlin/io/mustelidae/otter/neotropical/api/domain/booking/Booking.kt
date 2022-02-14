@@ -94,7 +94,7 @@ class Booking(
 
     fun cancel() {
         this.items
-            .filter { it.status == Item.Status.ORDERED }
+            .filter { it.status != Item.Status.CANCELED }
             .forEach { it.cancel() }
         this.status = Status.CANCELED
     }

@@ -56,9 +56,11 @@ class NormalBooking : VerticalBooking {
 
     override fun cancel(cause: String): ExchangeResult {
         for (booking in bookings) {
-            val hasNoneTarget = booking.items.none { it.status == Item.Status.ORDERED }
-            if (hasNoneTarget)
-                throw PolicyException(Error(ErrorCode.PP02, "There is no target to cancel."))
+            if (booking.items.isNotEmpty()) {
+                val hasNoneTarget = booking.items.none { it.status != Item.Status.CANCELED }
+                if (hasNoneTarget)
+                    throw PolicyException(Error(ErrorCode.PP02, "There is no target to cancel."))
+            }
 
             booking.cancel()
         }

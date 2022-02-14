@@ -2,7 +2,9 @@ package io.mustelidae.otter.neotropical.api.domain.payment.method
 
 import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPaymentMethodClient
 import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
+import io.swagger.v3.oas.annotations.media.Schema
 
+@Schema(name = "Common.UsingPayMethod")
 data class UsingPayMethod(
     val creditCard: CreditCard?,
     val point: Point?,
