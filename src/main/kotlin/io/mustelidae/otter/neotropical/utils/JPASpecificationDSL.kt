@@ -82,7 +82,7 @@ fun <T> KProperty1<T, String?>.notLike(x: String): Specification<T> = spec { not
 fun <T> KProperty1<T, String?>.notLike(x: String, escapeChar: Char): Specification<T> = spec { notLike(it, x, escapeChar) }
 
 // And
-infix fun <T> Specification<T>.and(other: Specification<T>): Specification<T> = this.and(other)!!
+infix fun <T> Specification<T>.and(other: Specification<T>): Specification<T> = this.and(other)
 
 inline fun <reified T> and(vararg specs: Specification<T>?): Specification<T> {
     return and(specs.toList())
@@ -93,7 +93,7 @@ inline fun <reified T> and(specs: Iterable<Specification<T>?>): Specification<T>
 }
 
 // Or
-infix fun <T> Specification<T>.or(other: Specification<T>): Specification<T> = this.or(other)!!
+infix fun <T> Specification<T>.or(other: Specification<T>): Specification<T> = this.or(other)
 
 inline fun <reified T> or(vararg specs: Specification<T>?): Specification<T> {
     return or(specs.toList())
