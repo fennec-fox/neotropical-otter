@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Cancel")
 @RestController
 @RequestMapping("/v1/maintenance/bookings")
-class BookingMaintenanceController(
+class BookingCancelMaintenanceController(
     private val bookingFinder: BookingFinder,
     private val bookingCancelInteraction: BookingCancelInteraction
 ) {

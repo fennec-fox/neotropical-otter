@@ -17,6 +17,13 @@ import javax.persistence.Index
 import javax.persistence.OneToMany
 import javax.persistence.Table
 
+/**
+ * Payment Information
+ * @property refundAmount   Amount returned to the user (including points)
+ *                          always expressed as a positive number.
+ * @property penaltyAmount  Penalty for cancellation by user
+ *                          always expressed as a negative number.
+ */
 @Entity
 @Table(
     indexes = [
@@ -61,7 +68,7 @@ class Payment(
     var paidDate: LocalDateTime? = null
         protected set
 
-    // cancel (refund)
+    // cancel
     var refundAmount: Long? = null
     var penaltyAmount: Long? = null
     var cancelledDate: LocalDateTime? = null
@@ -165,7 +172,7 @@ class Payment(
     fun cancelEntire(cancelDate: LocalDateTime, amountOfPenalty: Long) {
         status = Status.CANCEL_ALL
         this.cancelledDate = cancelDate
-        refundAmount = -1 * paidAmount!! + amountOfPenalty
+        refundAmount = paidAmount!! + (amountOfPenalty * -1)
         this.penaltyAmount = amountOfPenalty
     }
 

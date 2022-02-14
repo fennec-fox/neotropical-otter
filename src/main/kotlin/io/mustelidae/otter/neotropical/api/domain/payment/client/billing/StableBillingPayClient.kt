@@ -11,15 +11,6 @@ class StableBillingPayClient(
         TODO("Not yet implemented")
     }
 
-    override fun repay(
-        userId: Long,
-        billPayId: Long,
-        amountOfPay: Long,
-        adjustmentId: Long?
-    ): BillingClientResources.Reply.PaidResult {
-        TODO("Not yet implemented")
-    }
-
     override fun cancelEntire(userId: Long, billPayId: Long, cause: String): BillingClientResources.Reply.CancelResult {
         TODO("Not yet implemented")
     }

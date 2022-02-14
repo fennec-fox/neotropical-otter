@@ -18,11 +18,6 @@ sealed interface PayWay {
         adjustmentId: Long
     )
 
-    fun repay(
-        amountOfRepay: Long,
-        adjustmentId: Long?
-    )
-
     fun cancel(cause: String)
     fun cancelWithPenalty(cause: String, amountOfPenalty: Long)
     fun cancelPartial(cause: String, partialCancelAmount: Long)

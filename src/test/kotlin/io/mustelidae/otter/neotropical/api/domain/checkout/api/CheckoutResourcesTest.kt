@@ -141,3 +141,18 @@ fun CheckoutResources.Request.Checkout.Companion.aFixtureByMultiProduct(userId: 
         )
     )
 }
+
+fun CheckoutResources.Request.Checkout.getTotalPrice(): Long {
+    var totalPrice: Long = 0
+    for (product in products) {
+
+        for (goods in product.goodsOrders ?: emptyList()) {
+            val priceOfOption = goods.goodsOptionOrders?.sumOf { it.price ?: 0 } ?: 0
+            val priceOfGoods = ((goods.priceOfUnit ?: 0) - (goods.discountPriceOfUnit ?: 0)) * goods.quantity
+            totalPrice += (priceOfGoods + priceOfOption)
+        }
+        totalPrice += product.price ?: 0
+    }
+
+    return totalPrice
+}

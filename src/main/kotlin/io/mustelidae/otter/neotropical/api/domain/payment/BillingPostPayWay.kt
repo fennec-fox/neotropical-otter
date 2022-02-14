@@ -42,16 +42,13 @@ class BillingPostPayWay : PayWay {
         )
     }
 
-    override fun repay(amountOfRepay: Long, adjustmentId: Long?) {
-        BillingPrePayWay(payment, billingPayClient).repay(amountOfRepay, adjustmentId)
-    }
-
     override fun cancel(cause: String) {
         if (this.payment.isPaid())
             BillingPrePayWay(payment, billingPayClient).cancel(cause)
         else {
             this.payment.cancelByChangeOnlyStatus()
         }
+        payment.appendMemo(cause)
     }
 
     override fun cancelWithPenalty(cause: String, amountOfPenalty: Long) {
@@ -60,6 +57,7 @@ class BillingPostPayWay : PayWay {
         else {
             this.payment.cancelByChangeOnlyStatus()
         }
+        payment.appendMemo(cause)
     }
 
     override fun cancelPartial(cause: String, partialCancelAmount: Long) {

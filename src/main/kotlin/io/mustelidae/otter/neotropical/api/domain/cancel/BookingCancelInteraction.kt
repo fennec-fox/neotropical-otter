@@ -6,6 +6,7 @@ import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.config.PolicyException
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
+import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
 import io.mustelidae.otter.neotropical.api.domain.vertical.CancellationUnit
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class BookingCancelInteraction(
     private val bookingFinder: BookingFinder,
+    private val bookingRepository: BookingRepository,
     private val verticalClient: VerticalClient,
     private val verticalHandler: VerticalHandler,
     private val payWayHandler: PayWayHandler,
@@ -48,6 +50,8 @@ class BookingCancelInteraction(
             payWay.cancelWithPenalty(cause, callOffBooking.cancelFee)
         else
             payWay.cancel(cause)
+
+        bookingRepository.saveAll(bookings)
     }
 
     fun cancelWithOutCallOff(bookingIds: List<Long>, cancelFee: Long, cause: String) {
@@ -62,6 +66,8 @@ class BookingCancelInteraction(
             payWay.cancelWithPenalty(cause, cancelFee)
         else
             payWay.cancel(cause)
+
+        bookingRepository.saveAll(bookings)
     }
 
     fun forceCancelWithoutVerticalShaking(bookingIds: List<Long>, cancelFee: Long, cause: String) {
@@ -80,6 +86,8 @@ class BookingCancelInteraction(
             payWay.cancelWithPenalty(cause, cancelFee)
         else
             payWay.cancel(cause)
+
+        bookingRepository.saveAll(bookings)
     }
 
     private fun getValidBookings(bookingIds: List<Long>): List<Booking> {

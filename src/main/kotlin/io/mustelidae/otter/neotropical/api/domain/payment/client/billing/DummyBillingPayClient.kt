@@ -62,47 +62,11 @@ class DummyBillingPayClient : BillingPayClient {
         )
     }
 
-    override fun repay(
-        userId: Long,
-        billPayId: Long,
-        amountOfPay: Long,
-        adjustmentId: Long?
-    ): BillingClientResources.Reply.PaidResult {
-
-        val raw = this.localStore.find { it.billPayId == billPayId }!!
-
-        raw.apply {
-            val repayPayload = this.payPayload.run {
-                DefaultPayPayload(
-                    productCode,
-                    topicId,
-                    userId,
-                    type,
-                    this.adjustmentId,
-                    bookOrderId,
-                    itemName,
-                    accountSettlementDate,
-                    amountOfPay,
-                    usingPayMethod,
-                    preDefineValue
-                )
-            }
-            this.payPayload = repayPayload
-        }
-
-        raw.billPayId = Random.nextLong()
-
-        return BillingClientResources.Reply.PaidResult(
-            raw.billPayId!!,
-            amountOfPay,
-            raw.methods, LocalDateTime.now()
-        )
-    }
-
     override fun cancelEntire(userId: Long, billPayId: Long, cause: String): BillingClientResources.Reply.CancelResult {
 
         val raw = this.localStore.find { it.billPayId == billPayId }!!
         raw.isCancel = true
+        raw.refundAmount = raw.payPayload.amountOfPay
 
         return BillingClientResources.Reply.CancelResult(
             billPayId,

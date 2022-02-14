@@ -15,10 +15,6 @@ class VoucherPayWay : PayWay {
         voucherClient.use(orderSheet.userId, orderSheet.productCode, orderSheet.topicId, voucher)
     }
 
-    override fun repay(amountOfRepay: Long, adjustmentId: Long?) {
-        throw DevelopMistakeException("Voucher payment does not support repayment")
-    }
-
     override fun cancel(cause: String) {
         this.payment.cancelByChangeOnlyStatus()
         voucherClient.cancel(payment.userId, payment.voucherId!!)

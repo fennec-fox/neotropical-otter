@@ -60,38 +60,28 @@ class BillingPrePayWay : PayWay {
         return reserveDates.maxOf { it }
     }
 
-    override fun repay(amountOfRepay: Long, adjustmentId: Long?) {
-        if (payment.isPaid().not())
-            throw DevelopMistakeException("Repayment is not possible.")
-
-        val paidResult = billingPayClient.repay(payment.userId, payment.billPayId!!, amountOfRepay, adjustmentId)
-        payment.paid(
-            paidResult.billPayId,
-            paidResult.amountOfPaid,
-            paidResult.paidMethods.map { it.method },
-            paidResult.transactionDate
-        )
-        payment.adjustmentId = adjustmentId
-    }
-
     override fun cancel(cause: String) {
         val result = billingPayClient.cancelEntire(payment.userId, payment.billPayId!!, cause)
         payment.cancelEntire(result.transactionDate, 0)
+        payment.appendMemo(cause)
     }
 
     override fun cancelWithPenalty(cause: String, amountOfPenalty: Long) {
         val result = billingPayClient.cancelEntireWithPenalty(payment.userId, payment.billPayId!!, cause, amountOfPenalty)
         payment.cancelEntire(result.transactionDate, result.penaltyAmount!!)
+        payment.appendMemo(cause)
     }
 
     override fun cancelPartial(cause: String, partialCancelAmount: Long) {
         val result = billingPayClient.cancelPartial(payment.userId, payment.billPayId!!, cause, partialCancelAmount)
         payment.cancelPartial(result.transactionDate, partialCancelAmount, 0)
+        payment.appendMemo(cause)
     }
 
     override fun cancelPartialWithPenalty(cause: String, partialCancelAmount: Long, amountOfPenalty: Long) {
         val result = billingPayClient.cancelPartialWithPenalty(payment.userId, payment.billPayId!!, cause, partialCancelAmount, amountOfPenalty)
         payment.cancelPartial(result.transactionDate, partialCancelAmount, amountOfPenalty)
+        payment.appendMemo(cause)
     }
 
     constructor(
