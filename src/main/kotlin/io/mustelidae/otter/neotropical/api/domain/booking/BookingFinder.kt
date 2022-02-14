@@ -4,7 +4,7 @@ import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.config.DataNotFindException
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingDSLRepository
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
-import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.BillingPayClient
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 class BookingFinder
 @Autowired constructor(
     private val bookingDSLRepository: BookingDSLRepository,
-    private val bookingRepository: BookingRepository,
-    private val billingPayClient: BillingPayClient
+    private val bookingRepository: BookingRepository
 ) {
 
     fun findInWithPayment(bookingIds: List<Long>): List<Booking> {
@@ -27,7 +26,7 @@ class BookingFinder
     }
 
     fun findAllByIds(bookingIds: List<Long>): List<Booking> {
-        val bookings = bookingRepository.findAllById(bookingIds) ?: emptyList()
+        val bookings = bookingRepository.findAllById(bookingIds)
         if (bookings.size != bookingIds.size)
             throw DataNotFindException("Couldn't find all the booking for the requested ID.")
 
@@ -56,6 +55,10 @@ class BookingFinder
         bookingId: Long
     ): Booking {
         return bookingDSLRepository.findOne(bookingId) ?: throw DataNotFindException(bookingId, "Booking does not exist.")
+    }
+
+    fun findAllByOrderId(orderId: ObjectId): List<Booking> {
+        return bookingRepository.findAllByOrderId(orderId.toString())
     }
 
     fun findRecentUsage(

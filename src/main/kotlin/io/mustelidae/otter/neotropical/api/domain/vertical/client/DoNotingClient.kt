@@ -25,7 +25,11 @@ class DoNotingClient : VerticalClient {
         throw DevelopMistakeException("This should do nothing.")
     }
 
-    override fun askWhetherCallOff(userId: Long, bookingIds: List<Long>): CallOffBooking {
+    override fun askBookCallOff(userId: Long, bookingIds: List<Long>): CallOffBooking {
         throw DevelopMistakeException("This should do nothing.")
+    }
+
+    override fun askItemCallOff(userId: Long, bookingId: Long, items: List<Long>): CallOffBooking {
+        TODO("Not yet implemented")
     }
 }

@@ -55,7 +55,6 @@ class NormalBooking : VerticalBooking {
     }
 
     override fun cancel(cause: String): ExchangeResult {
-
         for (booking in bookings) {
             val hasNoneTarget = booking.items.none { it.status == Item.Status.ORDERED }
             if (hasNoneTarget)

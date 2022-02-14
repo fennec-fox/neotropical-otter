@@ -4,11 +4,13 @@ import io.mustelidae.otter.neotropical.api.common.Reply
 import io.mustelidae.otter.neotropical.api.common.toReply
 import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.cancel.BookingCancelInteraction
+import io.mustelidae.otter.neotropical.api.domain.cancel.OrderCancelInteraction
 import io.mustelidae.otter.neotropical.api.lock.EnableUserLock
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,15 +22,33 @@ import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "Cancel")
 @RestController
-@RequestMapping("/v1/maintenance/bookings")
+@RequestMapping("/v1/maintenance/cancel")
 class BookingCancelMaintenanceController(
     private val bookingFinder: BookingFinder,
+    private val orderCancelInteraction: OrderCancelInteraction,
     private val bookingCancelInteraction: BookingCancelInteraction
 ) {
 
     @Parameter(name = RoleHeader.XAdmin.KEY, description = RoleHeader.XAdmin.NAME)
     @EnableUserLock
-    @DeleteMapping("{bookingIds}")
+    @DeleteMapping("order/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun cancel(
+        @PathVariable id: String,
+        @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
+        @RequestParam cancelFee: Long,
+        @RequestParam cause: String
+    ): Reply<Unit> {
+        val orderId = ObjectId(id)
+        val bookings = bookingFinder.findAllByOrderId(orderId)
+        DataAuthentication(RoleHeader.XAdmin, RoleHeader.XUser).validOrThrow(bookings)
+        orderCancelInteraction.cancelWithOutCallOff(orderId, cancelFee, cause)
+        return Unit.toReply()
+    }
+
+    @Parameter(name = RoleHeader.XAdmin.KEY, description = RoleHeader.XAdmin.NAME)
+    @EnableUserLock
+    @DeleteMapping("bookings/{bookingIds}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun cancel(
         @PathVariable bookingIds: List<Long>,

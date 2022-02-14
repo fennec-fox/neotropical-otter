@@ -45,4 +45,36 @@ internal class BookingCancelControllerTest : FlowTestSupport() {
             it.receipt.canceledDate shouldNotBe null
         }
     }
+
+    @Test
+    fun cancelBook() {
+        // Given
+        val userId = 2374283475L
+        val productCode = ProductCode.MOCK_UP
+        val topicId = Topic.topicMap[productCode]!!.first()
+        val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
+        val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
+        val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val cancelFlow = BookingCancelControllerFlow(mockMvc)
+
+        // When
+        val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
+        val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
+        val bookingRequest = BookingResources.Request.aFixturePrePayOfOnlyCredit(orderId)
+        val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
+        val targetBookingId = bookingIds.first()
+        cancelFlow.cancel(checkoutRequest.userId, listOf(targetBookingId))
+
+        // Then
+        val records = bookingGWFlow.recordBookings()
+        val recordDetail = bookingGWFlow.recordDetail(targetBookingId)
+
+        recordDetail.asClue {
+            it.status.name shouldBe Booking.Status.CANCELED.text
+            it.receipt.totalRefundAmount shouldNotBe null
+            it.receipt.canceledDate shouldNotBe null
+        }
+
+        records.size shouldBe 1
+    }
 }

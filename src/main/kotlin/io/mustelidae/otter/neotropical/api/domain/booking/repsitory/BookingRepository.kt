@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BookingRepository : JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking>
+interface BookingRepository : JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking> {
+    fun findAllByOrderId(orderId: String): List<Booking>
+}

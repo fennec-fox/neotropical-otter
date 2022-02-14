@@ -25,7 +25,7 @@ import javax.persistence.Table
 @Table(
     indexes = [
         Index(name = "IDX_BOOKING_USER", columnList = "userId,createdAt"),
-        Index(name = "IDX_BOOKING_VERTICAL-ID", columnList = "verticalId"),
+        Index(name = "IDX_BOOKING_ORDER-ID", columnList = "orderId"),
         Index(name = "IDX_BOOKING_CREATED-AT", columnList = "createdAt"),
         Index(name = "IDX_FK_BOOKING_PAYMENT-ID", columnList = "payment_id,id", unique = true)
     ]

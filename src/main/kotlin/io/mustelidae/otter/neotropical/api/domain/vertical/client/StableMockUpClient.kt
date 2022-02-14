@@ -26,7 +26,11 @@ class StableMockUpClient : VerticalClient {
         TODO("Not yet implemented")
     }
 
-    override fun askWhetherCallOff(userId: Long, bookingIds: List<Long>): CallOffBooking {
+    override fun askBookCallOff(userId: Long, bookingIds: List<Long>): CallOffBooking {
+        TODO("Not yet implemented")
+    }
+
+    override fun askItemCallOff(userId: Long, bookingId: Long, items: List<Long>): CallOffBooking {
         TODO("Not yet implemented")
     }
 }

@@ -10,7 +10,6 @@ import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
-import io.mustelidae.otter.neotropical.utils.sameOrThrow
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,36 +17,27 @@ import org.springframework.transaction.annotation.Transactional
 @Suppress("DuplicatedCode")
 @Service
 @Transactional
-class BookingCancelInteraction(
+class OrderCancelInteraction(
     private val bookingFinder: BookingFinder,
     private val bookingRepository: BookingRepository,
     private val verticalHandler: VerticalHandler,
     private val payWayHandler: PayWayHandler,
-    private val orderSheetFinder: OrderSheetFinder,
-    private val orderCancelInteraction: OrderCancelInteraction
+    private val orderSheetFinder: OrderSheetFinder
 ) {
 
-    fun cancel(bookingIds: List<Long>, cause: String) {
-        val bookings = bookingFinder.findAllByIds(bookingIds).apply {
-            sameOrThrow()
-        }
+    fun cancel(orderId: ObjectId, cause: String) {
+        val bookings = bookingFinder.findAllByOrderId(orderId)
         DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
+
         val representativeBooking = bookings.first()
-        val orderId = ObjectId(representativeBooking.orderId)
-
-        CancelWayCalibration(orderId, bookingFinder).apply {
-            if (isOrderCancel(bookingIds))
-                return orderCancelInteraction.cancel(orderId, cause)
-        }
-
         val verticalClient = verticalHandler.getClient(representativeBooking.productCode)
 
-        val callOffBooking = verticalClient.askBookCallOff(representativeBooking.userId, bookingIds).apply {
+        val callOffBooking = verticalClient.askBookCallOff(representativeBooking.userId, bookings.map { it.id!! }).apply {
             if (isPossible.not())
                 throw PolicyException(Error(ErrorCode.PL03, impossibleReason ?: "Cancellation is not possible."))
         }
 
-        val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(representativeBooking.orderId))
+        val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
         val verticalBooking = verticalHandler.getBooking(orderSheet, bookings)
         val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
         verticalBooking.cancel(cause)
@@ -60,19 +50,10 @@ class BookingCancelInteraction(
         bookingRepository.saveAll(bookings)
     }
 
-    fun cancelWithOutCallOff(bookingIds: List<Long>, cancelFee: Long, cause: String) {
-        val bookings = bookingFinder.findAllByIds(bookingIds).apply {
-            sameOrThrow()
-        }
+    fun cancelWithOutCallOff(orderId: ObjectId, cancelFee: Long, cause: String) {
+        val bookings = bookingFinder.findAllByOrderId(orderId)
         DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
-        val orderId = ObjectId(representativeBooking.orderId)
-
-        CancelWayCalibration(orderId, bookingFinder).apply {
-            if (isOrderCancel(bookingIds))
-                return orderCancelInteraction.cancelWithOutCallOff(orderId, cancelFee, cause)
-        }
-
         val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
         val verticalBooking = verticalHandler.getBooking(orderSheet, bookings)
         val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
@@ -86,20 +67,10 @@ class BookingCancelInteraction(
         bookingRepository.saveAll(bookings)
     }
 
-    fun forceCancelWithoutVerticalShaking(bookingIds: List<Long>, cancelFee: Long, cause: String) {
-        val bookings = bookingFinder.findAllByIds(bookingIds).apply {
-            sameOrThrow()
-        }
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
+    fun forceCancelWithoutVerticalShaking(orderId: ObjectId, cancelFee: Long, cause: String) {
+        val bookings = bookingFinder.findAllByOrderId(orderId)
         val representativeBooking = bookings.first()
-        val orderId = ObjectId(representativeBooking.orderId)
-
-        CancelWayCalibration(orderId, bookingFinder).apply {
-            if (isOrderCancel(bookingIds))
-                return orderCancelInteraction.forceCancelWithoutVerticalShaking(orderId, cancelFee, cause)
-        }
-
-        val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(representativeBooking.orderId))
+        val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
         val verticalBooking = verticalHandler.getBookingUseDoNotingVerticalClient(orderSheet, bookings)
 
         val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
