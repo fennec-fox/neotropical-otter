@@ -11,7 +11,7 @@ internal class BookingCancelMaintenanceControllerFlow(
 ) {
 
     fun cancel(userId: Long, bookingIds: List<Long>, cancelFee: Long) {
-        val uri = linkTo<BookingCancelMaintenanceController> { cancel(bookingIds, userId, cancelFee, "test") }.toUri()
+        val uri = linkTo<BookingCancelMaintenanceController> { cancel(userId, bookingIds, cancelFee, "test") }.toUri()
 
         mockMvc.delete(uri) {
             contentType = MediaType.APPLICATION_JSON

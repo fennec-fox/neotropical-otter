@@ -8,8 +8,6 @@ import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepos
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
-import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
-import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.mustelidae.otter.neotropical.utils.sameOrThrow
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
@@ -31,7 +29,6 @@ class BookingCancelInteraction(
         val bookings = bookingFinder.findAllByIds(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
         val orderId = ObjectId(representativeBooking.orderId)
 
@@ -49,9 +46,9 @@ class BookingCancelInteraction(
 
         val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(representativeBooking.orderId))
         val verticalBooking = verticalHandler.getBooking(orderSheet, bookings)
-        val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
         verticalBooking.cancel(cause)
 
+        val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
         if (callOffBooking.hasPenalty())
             payWay.cancelWithPenalty(cause, callOffBooking.cancelFee)
         else
@@ -64,7 +61,6 @@ class BookingCancelInteraction(
         val bookings = bookingFinder.findAllByIds(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
         val orderId = ObjectId(representativeBooking.orderId)
 
@@ -90,7 +86,6 @@ class BookingCancelInteraction(
         val bookings = bookingFinder.findAllByIds(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
         val orderId = ObjectId(representativeBooking.orderId)
 

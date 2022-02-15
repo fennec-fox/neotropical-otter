@@ -8,8 +8,6 @@ import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepos
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
-import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
-import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,8 +25,6 @@ class OrderCancelInteraction(
 
     fun cancel(orderId: ObjectId, cause: String) {
         val bookings = bookingFinder.findAllByOrderId(orderId)
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
-
         val representativeBooking = bookings.first()
         val verticalClient = verticalHandler.getClient(representativeBooking.productCode)
 
@@ -52,7 +48,6 @@ class OrderCancelInteraction(
 
     fun cancelWithOutCallOff(orderId: ObjectId, cancelFee: Long, cause: String) {
         val bookings = bookingFinder.findAllByOrderId(orderId)
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
         val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
         val verticalBooking = verticalHandler.getBooking(orderSheet, bookings)

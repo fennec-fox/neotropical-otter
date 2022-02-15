@@ -11,8 +11,31 @@ internal class BookingCancelControllerFlow(
 ) {
 
     fun cancel(userId: Long, bookingIds: List<Long>) {
-        val uri = linkTo<BookingCancelController> { cancel(bookingIds, userId) }.toUri()
+        val uri = linkTo<BookingCancelController> { cancel(userId, bookingIds) }.toUri()
 
+        mockMvc.delete(uri) {
+            contentType = MediaType.APPLICATION_JSON
+            header(RoleHeader.XUser.KEY, userId)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+        }
+    }
+
+    fun cancel(userId: Long, orderId: String) {
+        val uri = linkTo<BookingCancelController> { cancel(userId, orderId, null) }.toUri()
+
+        mockMvc.delete(uri) {
+            contentType = MediaType.APPLICATION_JSON
+            header(RoleHeader.XUser.KEY, userId)
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { is2xxSuccessful() }
+        }
+    }
+
+    fun cancel(userId: Long, bookingId: Long, items: List<Long>) {
+        val uri = linkTo<BookingCancelController> { cancelItem(userId, bookingId, items) }.toUri()
         mockMvc.delete(uri) {
             contentType = MediaType.APPLICATION_JSON
             header(RoleHeader.XUser.KEY, userId)
