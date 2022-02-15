@@ -49,9 +49,9 @@ class BookingCancelInteraction(
 
         val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(representativeBooking.orderId))
         val verticalBooking = verticalHandler.getBooking(orderSheet, bookings)
-        val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
         verticalBooking.cancel(cause)
 
+        val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
         if (callOffBooking.hasPenalty())
             payWay.cancelWithPenalty(cause, callOffBooking.cancelFee)
         else
