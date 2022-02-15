@@ -3,20 +3,16 @@ package io.mustelidae.otter.neotropical.api.domain.cancel
 import io.mustelidae.otter.neotropical.api.common.Error
 import io.mustelidae.otter.neotropical.api.common.ErrorCode
 import io.mustelidae.otter.neotropical.api.config.PolicyException
-import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepository
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
-import io.mustelidae.otter.neotropical.api.domain.vertical.CallOffBooking
-import io.mustelidae.otter.neotropical.api.domain.vertical.CancellationUnit
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
-import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
-import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+@Suppress("DuplicatedCode")
 @Service
 @Transactional
 class ItemCancelInteraction(
@@ -27,54 +23,76 @@ class ItemCancelInteraction(
     private val orderSheetFinder: OrderSheetFinder,
 ) {
 
-    fun cancel(cancellationUnit: CancellationUnit, cause: String) {
-        val bookingIds = cancellationUnit.cancelBooks.map { it.bookingId }
-        val bookings = bookingFinder.findAllByIds(bookingIds)
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
-        val userId = cancellationUnit.userId
-        val representativeBooking = bookings.first()
-        val productCode = representativeBooking.productCode
-        val orderId = ObjectId(representativeBooking.orderId)
-
-        val verticalClient = verticalHandler.getClient(productCode)
-
-        val callOfItems: MutableList<CallOffBooking> = mutableListOf()
-        for(cancelBook in cancellationUnit.cancelBooks){
-            val callOfItem = verticalClient.askItemCallOff(userId, cancelBook.bookingId, cancelBook.itemIds!!)
-            if(callOfItem.isPossible.not())
-                throw PolicyException(Error(ErrorCode.PL03, callOfItem.impossibleReason ?: "Cancellation is not possible."))
-
-            callOfItems.add(callOfItem)
-        }
-
+    fun cancel(bookingId: Long, items: List<Long>, cause: String) {
+        val booking = bookingFinder.findOneWithItem(bookingId)
+        val userId = booking.userId
+        val orderId = ObjectId(booking.orderId)
+        val verticalClient = verticalHandler.getClient(booking.productCode)
         val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
-        val verticalBooking = verticalHandler.getBooking(orderSheet, bookings)
+        val verticalBooking = verticalHandler.getBooking(orderSheet, listOf(booking))
 
-        verticalBooking.cancelByItem(cancellationUnit, cause)
-        val partialCancelAmount = getCancelPriceOfItems(bookings, cancellationUnit.cancelBooks)
-        val cancelFee = callOfItems.sumOf { it.cancelFee }
-        val payWay = payWayHandler.getPayWay(representativeBooking.payment!!)
-        if(cancelFee != 0L)
+        val callOfItem = verticalClient.askItemCallOff(userId, bookingId, items)
+        if (callOfItem.isPossible.not())
+            throw PolicyException(Error(ErrorCode.PL03, callOfItem.impossibleReason ?: "Cancellation is not possible."))
+
+        verticalBooking.cancelByItem(bookingId, items, cause)
+
+        val partialCancelAmount = booking.items
+            .filter { items.contains(it.id!!) }
+            .sumOf { it.getTotalPrice() }
+
+        val cancelFee = callOfItem.cancelFee
+        val payWay = payWayHandler.getPayWay(booking.payment!!)
+
+        if (cancelFee != 0L)
             payWay.cancelPartialWithPenalty(cause, partialCancelAmount, cancelFee)
         else
             payWay.cancelPartial(cause, partialCancelAmount)
 
-        bookingRepository.saveAll(bookings)
+        bookingRepository.save(booking)
     }
 
-    private fun getCancelPriceOfItems(bookings:List<Booking>, cancelBooks: List<CancellationUnit.CancelBook>): Long {
-        var price: Long = 0
-        for (cancelBook in cancelBooks) {
-            val booking = bookings.find { it.id!! == cancelBook.bookingId }!!
-            cancelBook.itemIds?.forEach { itemId ->
-                booking.items.find { it.id == itemId }!!.apply {
-                    price += getTotalPrice()
-                }
-            }
-        }
+    fun cancelWithOutCallOff(bookingId: Long, items: List<Long>, cause: String, cancelFee: Long) {
+        val booking = bookingFinder.findOneWithItem(bookingId)
+        val orderId = ObjectId(booking.orderId)
 
-        return price
+        val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
+        val verticalBooking = verticalHandler.getBooking(orderSheet, listOf(booking))
+
+        verticalBooking.cancelByItem(bookingId, items, cause)
+
+        val partialCancelAmount = booking.items
+            .filter { items.contains(it.id!!) }
+            .sumOf { it.getTotalPrice() }
+
+        val payWay = payWayHandler.getPayWay(booking.payment!!)
+
+        if (cancelFee != 0L)
+            payWay.cancelPartialWithPenalty(cause, partialCancelAmount, cancelFee)
+        else
+            payWay.cancelPartial(cause, partialCancelAmount)
+
+        bookingRepository.save(booking)
     }
 
+    fun forceCancelWithoutVerticalShaking(bookingId: Long, items: List<Long>, cause: String, cancelFee: Long) {
+        val booking = bookingFinder.findOneWithItem(bookingId)
+        val orderId = ObjectId(booking.orderId)
 
+        val orderSheet = orderSheetFinder.findOneOrThrow(orderId)
+        val verticalBooking = verticalHandler.getBookingUseDoNotingVerticalClient(orderSheet, listOf(booking))
+        verticalBooking.cancelByItem(bookingId, items, cause)
+
+        val partialCancelAmount = booking.items
+            .filter { items.contains(it.id!!) }
+            .sumOf { it.getTotalPrice() }
+
+        val payWay = payWayHandler.getPayWay(booking.payment!!)
+        if (cancelFee != 0L)
+            payWay.cancelPartialWithPenalty(cause, partialCancelAmount, cancelFee)
+        else
+            payWay.cancelPartial(cause, partialCancelAmount)
+
+        bookingRepository.save(booking)
+    }
 }

@@ -61,11 +61,21 @@ class BillingPostPayWay : PayWay {
     }
 
     override fun cancelPartial(cause: String, partialCancelAmount: Long) {
-        throw DevelopMistakeException("Postpaid payment does not support partial cancellation.")
+        if (this.payment.isPaid().not())
+            throw DevelopMistakeException("Partial cancellation is not possible if payment has not been completed.")
+
+        val result = billingPayClient.cancelPartial(payment.userId, payment.billPayId!!, cause, partialCancelAmount)
+        payment.cancelPartial(result.transactionDate, partialCancelAmount, 0)
+        payment.appendMemo(cause)
     }
 
     override fun cancelPartialWithPenalty(cause: String, partialCancelAmount: Long, amountOfPenalty: Long) {
-        throw DevelopMistakeException("Postpaid payment does not support partial cancellation.")
+        if (this.payment.isPaid().not())
+            throw DevelopMistakeException("Partial cancellation is not possible if payment has not been completed.")
+
+        val result = billingPayClient.cancelPartialWithPenalty(payment.userId, payment.billPayId!!, cause, partialCancelAmount, amountOfPenalty)
+        payment.cancelPartial(result.transactionDate, partialCancelAmount, amountOfPenalty)
+        payment.appendMemo(cause)
     }
 
     constructor(payment: Payment, billingPayClient: BillingPayClient) {

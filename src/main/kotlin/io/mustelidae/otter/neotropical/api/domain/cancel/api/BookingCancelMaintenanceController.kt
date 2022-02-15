@@ -4,6 +4,7 @@ import io.mustelidae.otter.neotropical.api.common.Reply
 import io.mustelidae.otter.neotropical.api.common.toReply
 import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.cancel.BookingCancelInteraction
+import io.mustelidae.otter.neotropical.api.domain.cancel.ItemCancelInteraction
 import io.mustelidae.otter.neotropical.api.domain.cancel.OrderCancelInteraction
 import io.mustelidae.otter.neotropical.api.lock.EnableUserLock
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
@@ -26,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController
 class BookingCancelMaintenanceController(
     private val bookingFinder: BookingFinder,
     private val orderCancelInteraction: OrderCancelInteraction,
-    private val bookingCancelInteraction: BookingCancelInteraction
+    private val bookingCancelInteraction: BookingCancelInteraction,
+    private val itemCancelInteraction: ItemCancelInteraction
 ) {
 
     @Parameter(name = RoleHeader.XAdmin.KEY, description = RoleHeader.XAdmin.NAME)
@@ -34,8 +36,8 @@ class BookingCancelMaintenanceController(
     @DeleteMapping("order/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun cancel(
-        @PathVariable id: String,
         @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
+        @PathVariable id: String,
         @RequestParam cancelFee: Long,
         @RequestParam cause: String
     ): Reply<Unit> {
@@ -51,14 +53,31 @@ class BookingCancelMaintenanceController(
     @DeleteMapping("bookings/{bookingIds}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun cancel(
-        @PathVariable bookingIds: List<Long>,
         @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
+        @PathVariable bookingIds: List<Long>,
         @RequestParam cancelFee: Long,
         @RequestParam cause: String
     ): Reply<Unit> {
         val bookings = bookingFinder.findAllByIds(bookingIds)
         DataAuthentication(RoleHeader.XAdmin, RoleHeader.XUser).validOrThrow(bookings)
         bookingCancelInteraction.cancelWithOutCallOff(bookingIds, cancelFee, cause)
+        return Unit.toReply()
+    }
+
+    @Parameter(name = RoleHeader.XAdmin.KEY, description = RoleHeader.XAdmin.NAME)
+    @EnableUserLock
+    @DeleteMapping("/booking/{bookingId}/items/{itemIds}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun cancelItem(
+        @RequestHeader(RoleHeader.XUser.KEY) userId: Long,
+        @PathVariable bookingId: Long,
+        @PathVariable itemIds: List<Long>,
+        @RequestParam cancelFee: Long,
+        @RequestParam cause: String
+    ): Reply<Unit> {
+        val booking = bookingFinder.findOneWithItem(bookingId)
+        DataAuthentication(RoleHeader.XAdmin, RoleHeader.XUser).validOrThrow(booking)
+        itemCancelInteraction.cancelWithOutCallOff(bookingId, itemIds, cause, cancelFee)
         return Unit.toReply()
     }
 }

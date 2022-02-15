@@ -28,6 +28,7 @@ enum class ErrorCode(val summary: String) {
     PP02("There are no items that can be canceled."),
     PP03("Vertical's Policy"),
     PP04("Information not grouped"),
+    PP05("Cancellation is not possible."),
 
     S000("common system error"),
     SA00("async execute error"),

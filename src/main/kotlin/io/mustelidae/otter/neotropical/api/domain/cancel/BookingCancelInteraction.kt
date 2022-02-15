@@ -8,8 +8,6 @@ import io.mustelidae.otter.neotropical.api.domain.booking.repsitory.BookingRepos
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.PayWayHandler
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
-import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
-import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.mustelidae.otter.neotropical.utils.sameOrThrow
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
@@ -31,7 +29,6 @@ class BookingCancelInteraction(
         val bookings = bookingFinder.findAllByIds(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
         val orderId = ObjectId(representativeBooking.orderId)
 
@@ -64,7 +61,6 @@ class BookingCancelInteraction(
         val bookings = bookingFinder.findAllByIds(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
         val orderId = ObjectId(representativeBooking.orderId)
 
@@ -90,7 +86,6 @@ class BookingCancelInteraction(
         val bookings = bookingFinder.findAllByIds(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XUser).validOrThrow(bookings)
         val representativeBooking = bookings.first()
         val orderId = ObjectId(representativeBooking.orderId)
 

@@ -27,7 +27,7 @@ class NormalBooking : VerticalBooking {
         this.bookings = bookings
         this.orderSheet = orderSheet
         this.amountOfPay = bookings.sumOf { it.getTotalPrice() }
-        this.adjustmentId = bookings.first().payment!!.adjustmentId!!
+        this.adjustmentId = bookings.first().payment!!.adjustmentId ?: orderSheet.adjustmentId
     }
 
     override val adjustmentId: Long
@@ -56,6 +56,8 @@ class NormalBooking : VerticalBooking {
 
     override fun cancel(cause: String): ExchangeResult {
         for (booking in bookings) {
+            booking.validOrThrow()
+
             if (booking.items.isNotEmpty()) {
                 val hasNoneTarget = booking.items.none { it.status != Item.Status.CANCELED }
                 if (hasNoneTarget)
@@ -67,16 +69,22 @@ class NormalBooking : VerticalBooking {
         return verticalClient.cancel(bookings.first().userId, bookings.map { it.id!! }, cause)
     }
 
-    override fun cancelByItem(cancellationUnit: CancellationUnit, cause: String): ExchangeResult {
-        for (cancelBook in cancellationUnit.cancelBooks) {
-            val booking = bookings.find { it.id!! == cancelBook.bookingId }!!
-            cancelBook.itemIds?.forEach { itemId ->
-                booking.items.find { it.id == itemId }!!.apply {
-                    cancel()
-                }
-            }
+    override fun cancelByItem(bookingId: Long, itemIds: List<Long>, cause: String): ExchangeResult {
+        val booking = bookings.find { it.id!! == bookingId }!!.apply {
+            validOrThrow()
         }
 
-        return verticalClient.cancelByItem(cancellationUnit, cause)
+        for (itemId in itemIds) {
+            val item = booking.items.find { it.id == itemId }!!
+            item.cancel()
+        }
+        return verticalClient.cancelByItem(booking.userId, bookingId, itemIds, cause)
     }
+}
+
+private fun Booking.validOrThrow() {
+    if (this.status == Booking.Status.BOOKED)
+        throw PolicyException(Error(ErrorCode.PP05, "Cancellation is not possible while in use."))
+    if (this.status == Booking.Status.CANCELED)
+        throw PolicyException(Error(ErrorCode.PP05, "It has already been cancelled."))
 }
