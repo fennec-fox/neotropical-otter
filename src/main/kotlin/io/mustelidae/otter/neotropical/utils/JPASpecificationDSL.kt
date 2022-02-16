@@ -1,6 +1,7 @@
 package io.mustelidae.otter.neotropical.utils
 
 /**
+ * @license http://www.apache.org/licenses/LICENSE-2.0
  * @ref https://github.com/consoleau/kotlin-jpa-specification-dsl
  */
 

@@ -6,5 +6,5 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Vehicle(
     val gradeId: Long,
     val name: String,
-    val platNumber: String
+    val plateNumber: String
 )

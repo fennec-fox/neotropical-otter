@@ -98,8 +98,15 @@ class RequestResponseLogFilter : OncePerRequestFilter() {
         val uri = request.requestURI
 
         return (
-            uri.startsWith("/health") || uri.startsWith("/favicon.ico") || uri.startsWith("/h2-console") || uri.startsWith("/actuator/health") ||
-                uri.startsWith("/webjars/springfox-swagger-ui")
+            uri.startsWith("/health")
+                    || uri.startsWith("/favicon.ico")
+                    || uri.startsWith("/h2-console")
+                    || uri.startsWith("/actuator/health")
+                    || uri.startsWith("/webjars/springfox-swagger-ui")
+                    || uri.startsWith("/swagger-ui/")
+                    || uri.startsWith("/swagger-ui.html")
+                    || uri.startsWith("/swagger-ui/index.html")
+                    || uri.startsWith("/v3/api-docs")
             )
     }
 }
@@ -152,11 +159,13 @@ private object PrivacyLogFilter {
     private const val stringValuePattern = "\"%s\"\\s*:\\s*\"([^\"]+)\",?"
     private const val intValuePattern = "\"%s\"\\s*:\\s*([0-9]+)"
     private val logPatterns = listOf(
-        stringValuePattern.format("name").toRegex(), // 이름
-        stringValuePattern.format("address").toRegex(), // 주소
-        stringValuePattern.format("phone").toRegex(), // 전화번호
-        stringValuePattern.format("plateNumber").toRegex(), // 자동차 번호
-        intValuePattern.format("userId").toRegex(), // 유저아이디
+        stringValuePattern.format("latitude").toRegex(),
+        stringValuePattern.format("address").toRegex(),
+        stringValuePattern.format("phone").toRegex(),
+        stringValuePattern.format("plateNumber").toRegex(),
+        intValuePattern.format("userId").toRegex(),
+        intValuePattern.format("latitude").toRegex(),
+        intValuePattern.format("longitude").toRegex(),
     )
 
     fun masking(input: String): String {
@@ -173,7 +182,7 @@ private object PrivacyLogFilter {
             replace
         } catch (e: Exception) {
             logger.error("", e)
-            "Privacy Masking Error" // 개인정보 이슈가 생길 수 있기 때문에 bypass 하지 않는다.
+            "Privacy Masking Error"
         }
     }
 }
