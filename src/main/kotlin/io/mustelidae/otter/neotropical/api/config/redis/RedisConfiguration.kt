@@ -1,5 +1,6 @@
 package io.mustelidae.otter.neotropical.api.config.redis
 
+import io.mustelidae.otter.neotropical.api.common.Constant
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -16,15 +17,18 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 class RedisConfiguration(
     private val properties: RedisProperties
 ) {
+    @Bean(name = [Constant.Redis.USER_LOCK])
+    fun userLockRedisTemplate(): StringRedisTemplate {
 
-    @Bean
-    fun stringRedisTemplate(): StringRedisTemplate {
         val configuration = RedisClusterConfiguration(
             properties.cluster.nodes
         ).apply {
-            this.password = RedisPassword.of(properties.password)
+            password = RedisPassword.of(properties.password)
         }
-        val factory = LettuceConnectionFactory(configuration).apply { afterPropertiesSet() }
+
+        val factory = LettuceConnectionFactory(configuration).apply {
+            afterPropertiesSet()
+        }
 
         return StringRedisTemplate().apply {
             setConnectionFactory(factory)
