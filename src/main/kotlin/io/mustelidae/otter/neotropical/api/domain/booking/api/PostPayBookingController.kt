@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "Booking")
+@Tag(name = "Booking - Post Pay")
 @RestController
 @RequestMapping("/v1/bookings")
 class PostPayBookingController(
@@ -38,7 +38,7 @@ class PostPayBookingController(
     private val bookingFinder: BookingFinder
 ) {
 
-    @Operation(summary = "Post Pay Book")
+    @Operation(summary = "Book")
     @PostMapping("post-pay-book")
     @EnableUserLock
     @ResponseStatus(HttpStatus.CREATED)
@@ -62,7 +62,7 @@ class PostPayBookingController(
             .toReplies()
     }
 
-    @Operation(summary = "Complete Post Pay Book")
+    @Operation(summary = "Complete")
     @Parameter(name = RoleHeader.XSystem.KEY, description = RoleHeader.XSystem.NAME)
     @PutMapping("{bookingIds}/complete-n-pay")
     fun complete(

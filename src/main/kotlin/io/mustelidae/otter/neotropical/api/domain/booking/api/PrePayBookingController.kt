@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "Booking")
+@Tag(name = "Booking - Pre Pay")
 @RestController
 @RequestMapping("/v1/bookings")
 class PrePayBookingController(
@@ -38,7 +38,7 @@ class PrePayBookingController(
     private val bookingFinder: BookingFinder
 ) {
 
-    @Operation(summary = "Pre Pay Book")
+    @Operation(summary = "Book")
     @PostMapping("pre-pay-book")
     @EnableUserLock
     @ResponseStatus(HttpStatus.CREATED)
@@ -63,7 +63,7 @@ class PrePayBookingController(
             .toReplies()
     }
 
-    @Operation(summary = "Complete Pre Pay")
+    @Operation(summary = "Complete")
     @Parameter(name = RoleHeader.XSystem.KEY, description = RoleHeader.XSystem.NAME)
     @PutMapping("{bookingIds}/complete")
     fun complete(

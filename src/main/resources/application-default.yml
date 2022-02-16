@@ -64,6 +64,7 @@ springdoc:
   show-actuator: false
   swagger-ui:
     enabled: true
+    tagsSorter: alpha
 
 app:
   client:
