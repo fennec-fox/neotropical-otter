@@ -11,8 +11,6 @@ import io.mustelidae.otter.neotropical.api.domain.payment.client.billing.Billing
 import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.domain.payment.voucher.client.VoucherClient
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
-import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
-import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.mustelidae.otter.neotropical.utils.sameOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -67,7 +65,6 @@ class PreBookInteraction(
         val bookings = bookingFinder.findInWithPayment(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
 
         for (booking in bookings) {
             booking.completed()

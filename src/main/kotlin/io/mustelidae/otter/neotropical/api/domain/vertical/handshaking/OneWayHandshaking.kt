@@ -4,7 +4,7 @@ import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.order.OrderInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.vertical.BookingApproval
-import io.mustelidae.otter.neotropical.api.domain.vertical.ExchangeResult
+import io.mustelidae.otter.neotropical.api.domain.vertical.ObtainResult
 
 class OneWayHandshaking(
     private val orderInteraction: OrderInteraction
@@ -13,11 +13,11 @@ class OneWayHandshaking(
         bookingApproval: BookingApproval,
         orderSheet: OrderSheet,
         bookings: List<Booking>
-    ): ExchangeResult {
-        val exchangeResult = bookingApproval.obtain(bookings, orderSheet)
+    ): ObtainResult {
+        val obtainResult = bookingApproval.obtain(bookings, orderSheet)
 
         // It should not be rolled back because it is a failure on the part of the order.
-        if (exchangeResult.isSuccess) {
+        if (obtainResult.isSuccess) {
             try {
                 orderInteraction.complete(orderSheet.id)
             } catch (e: Exception) {
@@ -31,6 +31,6 @@ class OneWayHandshaking(
             }
         }
 
-        return exchangeResult
+        return obtainResult
     }
 }

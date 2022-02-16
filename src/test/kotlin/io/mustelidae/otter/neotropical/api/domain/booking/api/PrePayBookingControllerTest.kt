@@ -24,6 +24,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
@@ -32,6 +33,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
         val activeBookings = bookingGWFlow.activeBookings()
 
+        bookFlow.confirm(productCode, bookingIds)
         prePayBookingFlow.complete(productCode, listOf(bookingIds.first()))
 
         val recordBookings = bookingGWFlow.recordBookings()
@@ -51,6 +53,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
@@ -59,6 +62,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
         val targetBookingId = bookingIds.first()
 
+        bookFlow.confirm(productCode, bookingIds)
         prePayBookingFlow.complete(productCode, listOf(targetBookingId))
 
         // Then
@@ -88,6 +92,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
@@ -96,6 +101,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
         val targetBookingId = bookingIds.first()
 
+        bookFlow.confirm(productCode, bookingIds)
         prePayBookingFlow.complete(productCode, listOf(targetBookingId))
 
         // Then
@@ -125,6 +131,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
@@ -133,6 +140,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
         val targetBookingId = bookingIds.first()
 
+        bookFlow.confirm(productCode, bookingIds)
         prePayBookingFlow.complete(productCode, listOf(targetBookingId))
 
         // Then
@@ -162,6 +170,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
@@ -170,6 +179,7 @@ internal class PrePayBookingControllerTest : FlowTestSupport() {
         val bookingIds = prePayBookingFlow.preBook(userId, bookingRequest)
         val targetBookingId = bookingIds.first()
 
+        bookFlow.confirm(productCode, bookingIds)
         prePayBookingFlow.complete(productCode, listOf(targetBookingId))
 
         // Then

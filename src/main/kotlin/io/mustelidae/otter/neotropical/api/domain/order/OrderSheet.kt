@@ -1,5 +1,6 @@
 package io.mustelidae.otter.neotropical.api.domain.order
 
+import io.mustelidae.otter.neotropical.api.common.Location
 import io.mustelidae.otter.neotropical.api.common.Privacy
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
@@ -50,8 +51,7 @@ class OrderSheet(
     var policyCapture: PolicyCapture? = null
         private set
 
-    var textOfPrivacy: String? = null
-        private set
+    private var textOfPrivacy: String? = null
 
     var estimateUsingPayMethod: UsingPayMethod? = null
         private set
@@ -76,7 +76,8 @@ class OrderSheet(
         val price: Long? = null,
         val description: String? = null,
         val reservationDate: LocalDateTime? = null,
-        val preDefineField: Map<String, Any?>? = null
+        val preDefineField: Map<String, Any?>? = null,
+        val location: Location? = null
     ) {
 
         data class Goods(
@@ -118,12 +119,6 @@ class OrderSheet(
         val snapShotPolicyCards: List<PolicyCard>
     )
 
-    fun capture(captureDate: LocalDateTime, snapShotPolicyCards: List<PolicyCard>) {
-        if (Status.ORDERED != status)
-            throw IllegalStateException("This is only possible when the order has been placed.")
-        this.policyCapture = PolicyCapture(captureDate, snapShotPolicyCards)
-    }
-
     fun setUsingPayMethod(usingPayMethod: UsingPayMethod) {
         if (this.estimateUsingPayMethod != null)
             throw IllegalStateException("Payment method information has already been set.")
@@ -156,6 +151,8 @@ class OrderSheet(
     }
 
     fun writeSnapShot(policyCapture: PolicyCapture) {
+        if (Status.ORDERED != status)
+            throw IllegalStateException("This is only possible when the order has been placed.")
         this.policyCapture = policyCapture
         this.modifiedAt = LocalDateTime.now()
     }

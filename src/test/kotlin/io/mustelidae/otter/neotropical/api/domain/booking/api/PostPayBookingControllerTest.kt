@@ -24,12 +24,14 @@ internal class PostPayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
         val bookingRequest = BookingResources.Request.aFixturePostPayOfCredit(orderId)
         val bookingIds = postPayBookingFlow.postBook(userId, bookingRequest)
+        bookFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, null)
         val targetBookingId = bookingIds.first()
 
@@ -58,12 +60,14 @@ internal class PostPayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
         val bookingRequest = BookingResources.Request.aFixturePostPayOfCreditWithDiscount(orderId)
         val bookingIds = postPayBookingFlow.postBook(userId, bookingRequest)
+        bookFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, null)
         val targetBookingId = bookingIds.first()
 
@@ -93,12 +97,14 @@ internal class PostPayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
         val bookingRequest = BookingResources.Request.aFixturePostPayOfVoucher(orderId)
         val bookingIds = postPayBookingFlow.postBook(userId, bookingRequest)
+        bookFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, null)
         val targetBookingId = bookingIds.first()
 
@@ -128,6 +134,7 @@ internal class PostPayBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
@@ -137,7 +144,7 @@ internal class PostPayBookingControllerTest : FlowTestSupport() {
         val completeRequest = BookingResources.Request.PostPayCompleteBook(
             100000
         )
-
+        bookFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, completeRequest)
         val targetBookingId = bookingIds.first()
 

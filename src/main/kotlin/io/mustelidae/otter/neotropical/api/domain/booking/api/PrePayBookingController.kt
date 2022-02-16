@@ -4,6 +4,7 @@ import io.mustelidae.otter.neotropical.api.common.Replies
 import io.mustelidae.otter.neotropical.api.common.Reply
 import io.mustelidae.otter.neotropical.api.common.toReplies
 import io.mustelidae.otter.neotropical.api.common.toReply
+import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.booking.PreBookInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
@@ -14,6 +15,8 @@ import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.lock.EnableUserLock
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
@@ -26,14 +29,16 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "Pre Pay Book")
+@Tag(name = "Booking")
 @RestController
 @RequestMapping("/v1/bookings")
 class PrePayBookingController(
     private val orderSheetFinder: OrderSheetFinder,
-    private val preBookingInteraction: PreBookInteraction
+    private val preBookingInteraction: PreBookInteraction,
+    private val bookingFinder: BookingFinder
 ) {
 
+    @Operation(summary = "Pre Pay Book")
     @PostMapping("pre-pay-book")
     @EnableUserLock
     @ResponseStatus(HttpStatus.CREATED)
@@ -58,10 +63,14 @@ class PrePayBookingController(
             .toReplies()
     }
 
+    @Operation(summary = "Complete Pre Pay")
+    @Parameter(name = RoleHeader.XSystem.KEY, description = RoleHeader.XSystem.NAME)
     @PutMapping("{bookingIds}/complete")
     fun complete(
         @PathVariable bookingIds: List<Long>
     ): Reply<Unit> {
+        val bookings = bookingFinder.findAllByIds(bookingIds)
+        DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
         preBookingInteraction.completed(bookingIds)
         return Unit.toReply()
     }

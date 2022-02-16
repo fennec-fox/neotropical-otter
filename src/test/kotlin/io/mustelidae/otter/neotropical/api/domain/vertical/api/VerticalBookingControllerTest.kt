@@ -8,6 +8,7 @@ import io.mustelidae.otter.neotropical.api.common.Topic
 import io.mustelidae.otter.neotropical.api.config.FlowTestSupport
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.Item
+import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingControllerFlow
 import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingMaintenanceControllerFlow
 import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingResources
 import io.mustelidae.otter.neotropical.api.domain.booking.api.PostPayBookingControllerFlow
@@ -31,12 +32,14 @@ internal class VerticalBookingControllerTest : FlowTestSupport() {
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val cancelFlow = VerticalBookingControllerFlow(mockMvc)
         val maintenanceFlow = BookingMaintenanceControllerFlow(mockMvc)
+        val booingFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByOnce(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
         val bookingRequest = BookingResources.Request.aFixturePostPayOfCredit(orderId)
         val bookingIds = postPayBookingFlow.postBook(userId, bookingRequest)
+        booingFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, null)
 
         cancelFlow.cancelAll(userId, orderId, productCode)
@@ -60,12 +63,14 @@ internal class VerticalBookingControllerTest : FlowTestSupport() {
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val cancelFlow = VerticalBookingControllerFlow(mockMvc)
         val maintenanceFlow = BookingMaintenanceControllerFlow(mockMvc)
+        val booingFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
         val bookingRequest = BookingResources.Request.aFixturePostPayOfVoucher(orderId)
         val bookingIds = postPayBookingFlow.postBook(userId, bookingRequest)
+        booingFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, null)
 
         cancelFlow.cancelAll(userId, orderId, productCode)
@@ -88,12 +93,14 @@ internal class VerticalBookingControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val verticalFlow = VerticalBookingControllerFlow(mockMvc)
+        val booingFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
         val bookingRequest = BookingResources.Request.aFixturePostPayOfVoucher(orderId)
         val bookingIds = postPayBookingFlow.postBook(userId, bookingRequest)
+        booingFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, null)
 
         // Then

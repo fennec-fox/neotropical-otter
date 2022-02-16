@@ -4,6 +4,7 @@ import io.mustelidae.otter.neotropical.api.common.Audit
 import io.mustelidae.otter.neotropical.api.common.Location
 import io.mustelidae.otter.neotropical.api.common.ProductCode
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
+import io.mustelidae.otter.neotropical.api.config.DevelopMistakeException
 import io.mustelidae.otter.neotropical.api.domain.payment.Payment
 import io.mustelidae.otter.neotropical.utils.fromJson
 import io.mustelidae.otter.neotropical.utils.toJson
@@ -88,11 +89,16 @@ class Booking(
 
     fun getLocation(): Location? = textOfLocation?.fromJson()
 
-    fun booked() {
+    fun book() {
+        if (status != Status.WAIT)
+            throw DevelopMistakeException("Booking [$id] is not in 'WAIT'.")
         this.status = Status.BOOKED
     }
 
     fun cancel() {
+        if (status == Status.CANCELED)
+            throw DevelopMistakeException("This booking has already been canceled.")
+
         this.items
             .filter { it.status != Item.Status.CANCELED }
             .forEach { it.cancel() }
@@ -100,6 +106,9 @@ class Booking(
     }
 
     fun completed() {
+        if (status != Status.BOOKED)
+            throw DevelopMistakeException("Booking [$id] is not in 'BOOKED'.")
+
         this.items
             .filter { it.status == Item.Status.ORDERED }
             .forEach { it.complete() }

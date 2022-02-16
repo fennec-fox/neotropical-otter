@@ -4,6 +4,7 @@ import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.vertical.CallOffBooking
 import io.mustelidae.otter.neotropical.api.domain.vertical.ExchangeResult
+import io.mustelidae.otter.neotropical.api.domain.vertical.ObtainResult
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.VerticalRecord
 
 class StableMockUpClient : VerticalClient {
@@ -21,7 +22,7 @@ class StableMockUpClient : VerticalClient {
         TODO("Not yet implemented")
     }
 
-    override fun obtain(bookings: List<Booking>, orderSheet: OrderSheet): ExchangeResult {
+    override fun obtain(bookings: List<Booking>, orderSheet: OrderSheet): ObtainResult {
         TODO("Not yet implemented")
     }
 

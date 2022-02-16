@@ -1,5 +1,6 @@
 package io.mustelidae.otter.neotropical.api.domain.checkout.api
 
+import io.mustelidae.otter.neotropical.api.common.Location
 import io.mustelidae.otter.neotropical.api.common.Privacy
 import io.mustelidae.otter.neotropical.api.common.design.SimpleContent
 import io.swagger.v3.oas.annotations.media.Schema
@@ -28,7 +29,8 @@ class CheckoutResources {
                 val description: String? = null,
                 val reservationDate: LocalDateTime? = null,
                 val id: Long? = null,
-                val preDefineField: Map<String, Any?>? = null
+                val preDefineField: Map<String, Any?>? = null,
+                val location: Location? = null
             ) {
 
                 @Schema(name = "Checkout.Request.Checkout.ProductOrder.GoodsOrder")

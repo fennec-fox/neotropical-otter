@@ -10,6 +10,7 @@ import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.vertical.CallOffBooking
 import io.mustelidae.otter.neotropical.api.domain.vertical.ExchangeResult
+import io.mustelidae.otter.neotropical.api.domain.vertical.ObtainResult
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.RecordCard
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.design.v1.VerticalRecord
 import kotlin.random.Random
@@ -106,11 +107,15 @@ class DummyVerticalClient(
         )
     }
 
-    override fun obtain(bookings: List<Booking>, orderSheet: OrderSheet): ExchangeResult {
+    override fun obtain(bookings: List<Booking>, orderSheet: OrderSheet): ObtainResult {
         return if (productEnv.dummyControl.obtainApproval)
-            ExchangeResult(true)
+            ObtainResult(true, onAutoConfirm = productEnv.dummyControl.onAutoConfirm)
         else
-            ExchangeResult(false, "Cancellation is not possible due to testing.")
+            ObtainResult(
+                false,
+                onAutoConfirm = productEnv.dummyControl.onAutoConfirm,
+                failCause = "Cancellation is not possible due to testing."
+            )
     }
 
     override fun askBookCallOff(userId: Long, bookingIds: List<Long>): CallOffBooking {

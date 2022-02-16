@@ -6,11 +6,11 @@ import io.mustelidae.otter.neotropical.api.config.PolicyException
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.DividingQuantityBookingMaker
 import io.mustelidae.otter.neotropical.api.domain.booking.Item
+import io.mustelidae.otter.neotropical.api.domain.order.OrderForm
 import io.mustelidae.otter.neotropical.api.domain.order.OrderInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 import io.mustelidae.otter.neotropical.api.domain.vertical.client.VerticalClient
 import io.mustelidae.otter.neotropical.api.domain.vertical.handshaking.OneWayHandshaking
-import java.time.LocalDateTime
 
 class NormalBooking : VerticalBooking {
     constructor(verticalClient: VerticalClient, orderSheet: OrderSheet) {
@@ -37,9 +37,9 @@ class NormalBooking : VerticalBooking {
     private val verticalClient: VerticalClient
 
     override fun book(orderInteraction: OrderInteraction): ExchangeResult {
-        val exchangeResult = OneWayHandshaking(orderInteraction).accept(verticalClient, orderSheet, bookings)
+        val obtainResult = OneWayHandshaking(orderInteraction).accept(verticalClient, orderSheet, bookings)
 
-        exchangeResult.pairingIds?.let { pairs ->
+        obtainResult.pairingIds?.let { pairs ->
             for (pair in pairs) {
                 bookings.find { it.id!! == pair.bookingId }!!.apply {
                     verticalId = pair.verticalId
@@ -47,11 +47,16 @@ class NormalBooking : VerticalBooking {
             }
         }
 
-        exchangeResult.policyCards?.let {
-            orderSheet.capture(LocalDateTime.now(), it)
+        obtainResult.policyCards?.let {
+            OrderForm(orderSheet).apply {
+                stompingPolicy(it)
+            }
         }
 
-        return exchangeResult
+        if (obtainResult.onAutoConfirm)
+            bookings.forEach { it.book() }
+
+        return obtainResult
     }
 
     override fun cancel(cause: String): ExchangeResult {

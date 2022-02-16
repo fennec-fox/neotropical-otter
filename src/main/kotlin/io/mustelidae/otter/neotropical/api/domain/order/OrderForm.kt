@@ -33,7 +33,8 @@ class OrderForm(
                         it.price,
                         it.description,
                         it.reservationDate,
-                        it.preDefineField
+                        it.preDefineField,
+                        it.location
                     )
                 },
                 adjustmentId,
@@ -75,7 +76,7 @@ class OrderForm(
     private fun inspectSettlementDate() {
         if (orderSheet.settlementDate == null) {
             val existDate = orderSheet.products.filter { it.reservationDate != null }
-            if (existDate.isNullOrEmpty())
+            if (existDate.isEmpty())
                 errors.rejectValue(
                     "parameter",
                     ErrorCode.HI01.toString(),

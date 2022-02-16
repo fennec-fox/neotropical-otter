@@ -8,6 +8,7 @@ import io.mustelidae.otter.neotropical.api.common.Topic
 import io.mustelidae.otter.neotropical.api.config.FlowTestSupport
 import io.mustelidae.otter.neotropical.api.domain.booking.Booking
 import io.mustelidae.otter.neotropical.api.domain.booking.Item
+import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingControllerFlow
 import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingMaintenanceControllerFlow
 import io.mustelidae.otter.neotropical.api.domain.booking.api.BookingResources
 import io.mustelidae.otter.neotropical.api.domain.booking.api.PostPayBookingControllerFlow
@@ -130,6 +131,7 @@ internal class BookingCancelControllerTest : FlowTestSupport() {
         val bookingGWFlow = BookingGWControllerFlow(mockMvc, userId)
         val cancelFlow = BookingCancelControllerFlow(mockMvc)
         val maintenanceFlow = BookingMaintenanceControllerFlow(mockMvc)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
@@ -138,6 +140,7 @@ internal class BookingCancelControllerTest : FlowTestSupport() {
         val bookingIds = bookingFlow.postBook(userId, bookingRequest)
         val targetBookingId = bookingIds.first()
         val reply = maintenanceFlow.findOne(targetBookingId)
+        bookFlow.confirm(productCode, bookingIds)
         bookingFlow.complete(productCode, bookingIds, null)
 
         val itemId = reply.items.first().id

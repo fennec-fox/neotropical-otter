@@ -14,7 +14,5 @@ interface VerticalBooking {
 
     fun cancel(cause: String): ExchangeResult
 
-    /*fun cancelByItem(cancellationUnit: CancellationUnit, cause: String): ExchangeResult*/
-
     fun cancelByItem(bookingId: Long, itemIds: List<Long>, cause: String): ExchangeResult
 }

@@ -23,12 +23,14 @@ internal class BookingMaintenanceControllerTest : FlowTestSupport() {
         val checkoutFlow = CheckoutControllerFlow(productCode, mockMvc)
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val maintenanceFlow = BookingMaintenanceControllerFlow(mockMvc)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
         val checkoutRequest = CheckoutResources.Request.Checkout.aFixtureByMultiProduct(userId)
         val orderId = checkoutFlow.checkout(topicId, checkoutRequest)
         val bookingRequest = BookingResources.Request.aFixturePostPayOfCredit(orderId)
         val bookingIds = postPayBookingFlow.postBook(userId, bookingRequest)
+        bookFlow.confirm(productCode, bookingIds)
         postPayBookingFlow.complete(productCode, bookingIds, null)
         val targetBookingId = bookingIds.first()
         // Then
@@ -50,6 +52,7 @@ internal class BookingMaintenanceControllerTest : FlowTestSupport() {
         val postPayBookingFlow = PostPayBookingControllerFlow(mockMvc)
         val maintenanceFlow = BookingMaintenanceControllerFlow(mockMvc)
         val prePayBookingFlow = PrePayBookingControllerFlow(mockMvc)
+        val bookFlow = BookingControllerFlow(mockMvc)
 
         // When
 
@@ -58,6 +61,7 @@ internal class BookingMaintenanceControllerTest : FlowTestSupport() {
         val orderIdOfPostBook = checkoutFlow.checkout(topicId, requestOfPostBook)
         val requestBookOfPostBook = BookingResources.Request.aFixturePostPayOfCredit(orderIdOfPostBook)
         val bookingIdsOfPostBook = postPayBookingFlow.postBook(userId, requestBookOfPostBook)
+        bookFlow.confirm(productCode, bookingIdsOfPostBook)
         postPayBookingFlow.complete(productCode, bookingIdsOfPostBook, null)
 
         // Pre Book
@@ -65,6 +69,7 @@ internal class BookingMaintenanceControllerTest : FlowTestSupport() {
         val orderIdOfPreBook = checkoutFlow.checkout(topicId, requestCheckoutOfPreBook)
         val requestBookOfPreBook = BookingResources.Request.aFixturePrePayOfCreditWithPoint(orderIdOfPreBook)
         val bookingIdsOfPreBook = prePayBookingFlow.preBook(userId, requestBookOfPreBook)
+        bookFlow.confirm(productCode, bookingIdsOfPreBook)
         prePayBookingFlow.complete(productCode, listOf(bookingIdsOfPreBook.first()))
 
         // Then
@@ -73,6 +78,6 @@ internal class BookingMaintenanceControllerTest : FlowTestSupport() {
         searchedBookings.size shouldBe 4
         val groupOfBooking = searchedBookings.groupBy { it.status }
         groupOfBooking[Booking.Status.COMPLETED]!!.size shouldBe 3
-        groupOfBooking[Booking.Status.WAIT]!!.size shouldBe 1
+        groupOfBooking[Booking.Status.BOOKED]!!.size shouldBe 1
     }
 }

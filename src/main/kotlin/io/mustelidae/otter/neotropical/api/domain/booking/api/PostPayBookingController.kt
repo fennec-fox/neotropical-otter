@@ -4,6 +4,7 @@ import io.mustelidae.otter.neotropical.api.common.Replies
 import io.mustelidae.otter.neotropical.api.common.Reply
 import io.mustelidae.otter.neotropical.api.common.toReplies
 import io.mustelidae.otter.neotropical.api.common.toReply
+import io.mustelidae.otter.neotropical.api.domain.booking.BookingFinder
 import io.mustelidae.otter.neotropical.api.domain.booking.PostBookInteraction
 import io.mustelidae.otter.neotropical.api.domain.order.OrderSheetFinder
 import io.mustelidae.otter.neotropical.api.domain.payment.method.CreditCard
@@ -14,6 +15,8 @@ import io.mustelidae.otter.neotropical.api.domain.payment.method.Voucher
 import io.mustelidae.otter.neotropical.api.lock.EnableUserLock
 import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
 import io.mustelidae.otter.neotropical.api.permission.RoleHeader
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
@@ -26,14 +29,16 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "Post Pay Book")
+@Tag(name = "Booking")
 @RestController
 @RequestMapping("/v1/bookings")
 class PostPayBookingController(
     private val orderSheetFinder: OrderSheetFinder,
-    private val postBookInteraction: PostBookInteraction
+    private val postBookInteraction: PostBookInteraction,
+    private val bookingFinder: BookingFinder
 ) {
 
+    @Operation(summary = "Post Pay Book")
     @PostMapping("post-pay-book")
     @EnableUserLock
     @ResponseStatus(HttpStatus.CREATED)
@@ -57,11 +62,16 @@ class PostPayBookingController(
             .toReplies()
     }
 
+    @Operation(summary = "Complete Post Pay Book")
+    @Parameter(name = RoleHeader.XSystem.KEY, description = RoleHeader.XSystem.NAME)
     @PutMapping("{bookingIds}/complete-n-pay")
     fun complete(
         @PathVariable bookingIds: List<Long>,
         @RequestBody request: BookingResources.Request.PostPayCompleteBook? = null
     ): Reply<Unit> {
+        val bookings = bookingFinder.findAllByIds(bookingIds)
+        DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
+
         postBookInteraction.completed(
             bookingIds,
             request?.changeAmount,

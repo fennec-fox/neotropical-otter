@@ -159,10 +159,10 @@ class GWRecordBookingResources {
             ) {
                 companion object {
                     fun from(orderSheet: OrderSheet, verticalRecord: VerticalRecord): Detail {
-                        var policyCards = orderSheet.policyCapture?.snapShotPolicyCards
-
-                        if (policyCards == null)
-                            policyCards = verticalRecord.recordCard.policyCard
+                        val policyCards = if (orderSheet.hasPolicySnapShot())
+                            orderSheet.policyCapture!!.snapShotPolicyCards
+                        else
+                            verticalRecord.recordCard.policyCard
 
                         return Detail(
                             verticalRecord.recordCard.displayCards,

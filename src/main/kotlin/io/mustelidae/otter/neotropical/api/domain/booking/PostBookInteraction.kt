@@ -12,8 +12,6 @@ import io.mustelidae.otter.neotropical.api.domain.payment.PaymentMethodCalibrati
 import io.mustelidae.otter.neotropical.api.domain.payment.VoucherPayWay
 import io.mustelidae.otter.neotropical.api.domain.payment.method.UsingPayMethod
 import io.mustelidae.otter.neotropical.api.domain.vertical.VerticalHandler
-import io.mustelidae.otter.neotropical.api.permission.DataAuthentication
-import io.mustelidae.otter.neotropical.api.permission.RoleHeader
 import io.mustelidae.otter.neotropical.utils.sameOrThrow
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
@@ -80,7 +78,6 @@ class PostBookInteraction(
         val bookings = bookingFinder.findInWithPayment(bookingIds).apply {
             sameOrThrow()
         }
-        DataAuthentication(RoleHeader.XSystem).validOrThrow(bookings)
 
         val orderSheet = orderSheetFinder.findOneOrThrow(ObjectId(bookings.first().orderId))
         val userId = orderSheet.userId

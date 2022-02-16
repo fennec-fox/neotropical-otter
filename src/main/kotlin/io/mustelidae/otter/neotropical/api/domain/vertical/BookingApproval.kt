@@ -5,5 +5,5 @@ import io.mustelidae.otter.neotropical.api.domain.order.OrderSheet
 
 interface BookingApproval {
 
-    fun obtain(bookings: List<Booking>, orderSheet: OrderSheet): ExchangeResult
+    fun obtain(bookings: List<Booking>, orderSheet: OrderSheet): ObtainResult
 }

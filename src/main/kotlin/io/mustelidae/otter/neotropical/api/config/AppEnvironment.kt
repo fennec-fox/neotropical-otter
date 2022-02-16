@@ -37,6 +37,7 @@ class AppEnvironment {
             var obtainApproval: Boolean = true
             var cancelByItem: Boolean = true
             var callOff: Boolean = true
+            var onAutoConfirm: Boolean = false
         }
     }
 
